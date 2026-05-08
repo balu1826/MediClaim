@@ -1,0 +1,6 @@
+@MediClaim.Domain_HostAddress = http://localhost:5037
+
+GET {{MediClaim.Domain_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
