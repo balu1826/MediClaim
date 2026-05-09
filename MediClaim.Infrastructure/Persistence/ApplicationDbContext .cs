@@ -1,0 +1,46 @@
+﻿using MediClaim.Application.Common.Interfaces;
+using MediClaim.Domain.Common;
+using MediClaim.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
+
+namespace MediClaim.Infrastructure.Persistence;
+
+public class ApplicationDbContext : DbContext
+{
+    private readonly ICurrentTenantService _currentTenantService;
+    public ApplicationDbContext(
+        DbContextOptions<ApplicationDbContext> options, ICurrentTenantService currentTenantService)
+        : base(options)
+    {
+        _currentTenantService = currentTenantService;
+    }
+
+    public DbSet<Tenant> Tenants => Set<Tenant>();
+
+    public DbSet<User> Users => Set<User>();
+
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+
+    protected override void OnModelCreating(
+    ModelBuilder modelBuilder)
+    {
+        modelBuilder.ApplyConfigurationsFromAssembly(
+            typeof(ApplicationDbContext).Assembly);
+
+        modelBuilder.Entity<User>()
+     .HasQueryFilter(x =>
+         !x.IsDeleted &&
+         (_currentTenantService.TenantId == null
+          || x.TenantId ==
+             _currentTenantService.TenantId));
+
+        modelBuilder.Entity<RefreshToken>()
+            .HasQueryFilter(x =>
+                !x.IsDeleted);
+
+        base.OnModelCreating(modelBuilder);
+        
+    }
+    
+}
