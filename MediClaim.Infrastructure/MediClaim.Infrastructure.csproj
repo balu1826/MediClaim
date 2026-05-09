@@ -39,8 +39,6 @@
     <Folder Include="Caching\" />
     <Folder Include="Persistence\Migrations\" />
     <Folder Include="Storage\" />
-    <Folder Include="Security\" />
-    <Folder Include="Repositories\" />
   </ItemGroup>
 
 </Project>

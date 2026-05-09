@@ -2,6 +2,8 @@
 using MediClaim.Infrastructure.MultiTenancy;
 using MediClaim.Infrastructure.Persistence;
 using MediClaim.Infrastructure.Persistence.Interceptors;
+using MediClaim.Infrastructure.Repositories;
+using MediClaim.Infrastructure.Security;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,7 +39,11 @@ public static class DependencyInjection
 
                 options.AddInterceptors(interceptor);
             });
-
+        services.AddScoped(typeof(IRepository<>),typeof(Repository<>));
+        services.AddScoped<IUnitOfWork,UnitOfWork>();
+        services.AddScoped<IUserRepository,UserRepository>();
+        services.AddScoped<ITenantRepository,TenantRepository>();
+        services.AddScoped<IEncryptionService,EncryptionService>();
         return services;
     }
 }
