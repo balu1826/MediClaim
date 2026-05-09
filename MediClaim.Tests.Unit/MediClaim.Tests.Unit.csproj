@@ -15,6 +15,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MediClaim.Application\MediClaim.Application.csproj" />
+    <ProjectReference Include="..\MediClaim.Domain\MediClaim.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
 
