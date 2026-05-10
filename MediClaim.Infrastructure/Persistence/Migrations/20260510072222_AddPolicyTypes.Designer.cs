@@ -4,6 +4,7 @@ using MediClaim.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MediClaim.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260510072222_AddPolicyTypes")]
+    partial class AddPolicyTypes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -47,19 +50,11 @@ namespace MediClaim.Infrastructure.Persistence.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<Guid>("PolicyId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("TreatmentCategory")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -69,104 +64,11 @@ namespace MediClaim.Infrastructure.Persistence.Migrations
 
                     b.HasKey("ClaimId");
 
-                    b.HasIndex("PolicyId");
-
                     b.HasIndex("TenantId");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("Claims");
-                });
-
-            modelBuilder.Entity("MediClaim.Domain.Entities.Policy", b =>
-                {
-                    b.Property<Guid>("PolicyId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<decimal>("AnnualLimit")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateOnly>("EndDate")
-                        .HasColumnType("date");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid>("PatientId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("PolicyNumber")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
-                    b.Property<Guid>("PolicyTypeId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
-
-                    b.Property<DateOnly>("StartDate")
-                        .HasColumnType("date");
-
-                    b.Property<Guid>("TenantId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal>("UsedAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("PolicyId");
-
-                    b.HasIndex("PatientId");
-
-                    b.HasIndex("PolicyNumber")
-                        .IsUnique();
-
-                    b.HasIndex("PolicyTypeId");
-
-                    b.HasIndex("TenantId");
-
-                    b.ToTable("Policies");
-                });
-
-            modelBuilder.Entity("MediClaim.Domain.Entities.PolicyCoverageCategory", b =>
-                {
-                    b.Property<Guid>("PolicyCoverageCategoryId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<Guid>("PolicyTypeId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("PolicyCoverageCategoryId");
-
-                    b.HasIndex("PolicyTypeId");
-
-                    b.ToTable("PolicyCoverageCategory");
                 });
 
             modelBuilder.Entity("MediClaim.Domain.Entities.PolicyType", b =>
@@ -360,12 +262,6 @@ namespace MediClaim.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("MediClaim.Domain.Entities.Claim", b =>
                 {
-                    b.HasOne("MediClaim.Domain.Entities.Policy", "Policy")
-                        .WithMany()
-                        .HasForeignKey("PolicyId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("MediClaim.Domain.Entities.Tenant", "Tenant")
                         .WithMany()
                         .HasForeignKey("TenantId")
@@ -378,51 +274,11 @@ namespace MediClaim.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Policy");
-
                     b.Navigation("Tenant");
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MediClaim.Domain.Entities.Policy", b =>
-                {
-                    b.HasOne("MediClaim.Domain.Entities.User", "Patient")
-                        .WithMany()
-                        .HasForeignKey("PatientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MediClaim.Domain.Entities.PolicyType", "PolicyType")
-                        .WithMany()
-                        .HasForeignKey("PolicyTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MediClaim.Domain.Entities.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Patient");
-
-                    b.Navigation("PolicyType");
-
-                    b.Navigation("Tenant");
-                });
-
-            modelBuilder.Entity("MediClaim.Domain.Entities.PolicyCoverageCategory", b =>
-                {
-                    b.HasOne("MediClaim.Domain.Entities.PolicyType", "PolicyType")
-                        .WithMany("CoverageCategories")
-                        .HasForeignKey("PolicyTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("PolicyType");
-                });
-
             modelBuilder.Entity("MediClaim.Domain.Entities.PolicyType", b =>
                 {
                     b.HasOne("MediClaim.Domain.Entities.Tenant", "Tenant")
@@ -432,11 +288,6 @@ namespace MediClaim.Infrastructure.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Tenant");
-                });
-
-            modelBuilder.Entity("MediClaim.Domain.Entities.PolicyType", b =>
-                {
-                    b.Navigation("CoverageCategories");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,0 +1,109 @@
+﻿using MediClaim.Domain.Common;
+using MediClaim.Domain.Enums;
+
+namespace MediClaim.Domain.Entities;
+
+public class Claim
+    : BaseEntity
+{
+    public Guid ClaimId { get; set; }
+
+    public Guid TenantId { get; set; }
+
+    public Guid UserId { get; set; }
+
+    public decimal Amount { get; set; }
+
+    public string DiagnosisCode { get; set; }
+        = default!;
+
+    public string Description { get; set; }
+        = default!;
+
+    public ClaimStatus Status { get; set; }
+
+    public User User { get; set; }
+        = default!;
+
+    public Tenant Tenant { get; set; }
+        = default!;
+    public Guid PolicyId
+    {
+        get; set;
+    }
+
+    public string TreatmentCategory
+    {
+        get; set;
+    } = default!;
+
+    public Policy Policy
+    {
+        get; set;
+    } = default!;
+    public void Submit()
+    {
+        if (Status != ClaimStatus.Draft)
+        {
+            throw new InvalidOperationException(
+                "Only draft claims can be submitted");
+        }
+
+        Status = ClaimStatus.Submitted;
+    }
+
+    public void StartReview()
+    {
+        if (Status != ClaimStatus.Submitted)
+        {
+            throw new InvalidOperationException(
+                "Only submitted claims can be reviewed");
+        }
+
+        Status = ClaimStatus.UnderReview;
+    }
+
+    public void Approve()
+    {
+        if (Status != ClaimStatus.UnderReview)
+        {
+            throw new InvalidOperationException(
+                "Only claims under review can be approved");
+        }
+
+        Status = ClaimStatus.Approved;
+    }
+
+    public void Reject()
+    {
+        if (Status != ClaimStatus.UnderReview)
+        {
+            throw new InvalidOperationException(
+                "Only claims under review can be rejected");
+        }
+
+        Status = ClaimStatus.Rejected;
+    }
+
+    public void Escalate()
+    {
+        if (Status != ClaimStatus.UnderReview)
+        {
+            throw new InvalidOperationException(
+                "Only claims under review can be escalated");
+        }
+
+        Status = ClaimStatus.Escalated;
+    }
+
+    public void Withdraw()
+    {
+        if (Status == ClaimStatus.Settled)
+        {
+            throw new InvalidOperationException(
+                "Settled claims cannot be withdrawn");
+        }
+
+        Status = ClaimStatus.Withdrawn;
+    }
+}

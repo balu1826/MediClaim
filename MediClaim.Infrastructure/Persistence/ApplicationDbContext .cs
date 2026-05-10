@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 
 namespace MediClaim.Infrastructure.Persistence;
 
-public class ApplicationDbContext : DbContext
+public class ApplicationDbContext : DbContext, IApplicationDbContext
 {
     private readonly ICurrentTenantService _currentTenantService;
     public ApplicationDbContext(
@@ -19,6 +19,9 @@ public class ApplicationDbContext : DbContext
     public DbSet<Tenant> Tenants => Set<Tenant>();
 
     public DbSet<User> Users => Set<User>();
+    public DbSet<Claim> Claims=> Set<Claim>();
+    public DbSet<PolicyType>PolicyTypes=> Set<PolicyType>();
+    public DbSet<Policy> Policies=> Set<Policy>();
 
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 

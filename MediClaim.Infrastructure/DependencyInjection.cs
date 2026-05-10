@@ -55,6 +55,11 @@ public static class DependencyInjection
                                     jwtSettings.Key))
                     };
             });
+        services.AddScoped<
+    IApplicationDbContext>(
+        provider =>
+            provider.GetRequiredService
+                <ApplicationDbContext>());
         services.AddAuthorization();
         services.AddScoped<
             ICurrentTenantService,

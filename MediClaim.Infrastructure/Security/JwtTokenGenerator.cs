@@ -21,7 +21,7 @@ public class JwtTokenGenerator
 
     public string GenerateToken(User user)
     {
-        var claims = new List<Claim>
+        var claims = new List<System.Security.Claims.Claim>
         {
             new(
                 JwtRegisteredClaimNames.Sub,
