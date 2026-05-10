@@ -13,6 +13,7 @@ public interface IApplicationDbContext
     DbSet<Claim> Claims { get; }
     DbSet<PolicyType>  PolicyTypes  { get; }
     DbSet<Policy> Policies { get; }
+    DbSet<Provider> Providers { get; }
 
     Task<int> SaveChangesAsync(
         CancellationToken cancellationToken);

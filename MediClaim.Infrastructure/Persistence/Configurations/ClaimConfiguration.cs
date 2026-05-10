@@ -37,5 +37,18 @@ public class ClaimConfiguration
                     .HasForeignKey(
                         x => x.PolicyId)
                     .OnDelete(DeleteBehavior.Restrict);
+        builder.HasOne(
+            x => x.Provider)
+            .WithMany()
+            .HasForeignKey(
+                x => x.ProviderId)
+            .OnDelete(DeleteBehavior.Restrict);
+        builder.HasOne(
+    x => x.AssignedOfficer)
+    .WithMany()
+    .HasForeignKey(
+        x => x.AssignedOfficerId)
+    .OnDelete(
+        DeleteBehavior.Restrict);
     }
 }

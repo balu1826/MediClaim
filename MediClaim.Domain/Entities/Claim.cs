@@ -41,6 +41,57 @@ public class Claim
     {
         get; set;
     } = default!;
+
+    public int FraudRiskScore
+    {
+        get; set;
+    }
+
+    public bool RequiresFraudReview
+    {
+        get; set;
+    }
+    public Guid? ProviderId
+    {
+        get; set;
+    }
+
+    public DateOnly TreatmentDate
+    {
+        get; set;
+    }
+
+    public decimal? ApprovedAmount
+    {
+        get; set;
+    }
+    public Guid? AssignedOfficerId
+    {
+        get; set;
+    }
+
+    public User? AssignedOfficer
+    {
+        get; set;
+    }
+
+    public bool PendingAssignment
+    {
+        get; set;
+    }
+    public string? RejectionReason
+    {
+        get; set;
+    }
+
+    public DateTime? ReviewedAt
+    {
+        get; set;
+    }
+    public Provider Provider
+    {
+        get; set;
+    } = default!;
     public void Submit()
     {
         if (Status != ClaimStatus.Draft)
@@ -74,15 +125,16 @@ public class Claim
         Status = ClaimStatus.Approved;
     }
 
-    public void Reject()
+    public void Reject(string reason)
     {
         if (Status != ClaimStatus.UnderReview)
         {
             throw new InvalidOperationException(
                 "Only claims under review can be rejected");
         }
-
+        RejectionReason = reason;
         Status = ClaimStatus.Rejected;
+        ReviewedAt = DateTime.UtcNow;
     }
 
     public void Escalate()

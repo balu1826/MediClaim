@@ -1,6 +1,13 @@
 ﻿using MediatR;
+using MediClaim.Application.Features.Claims.ApproveClaim;
 using MediClaim.Application
     .Features.Claims.CreateDraftClaim;
+using MediClaim.Application.Features.Claims.EscalateClaim;
+using MediClaim.Application.Features.Claims.GetMyClaims;
+using MediClaim.Application.Features.Claims.GetOfficerQueue;
+using MediClaim.Application.Features.Claims.RejectClaim;
+using MediClaim.Application.Features.Claims.StartReview;
+using MediClaim.Application.Features.Claims.SubmitClaim;
 using MediClaim.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -35,5 +42,110 @@ public class ClaimsController
                 .Send(command);
 
         return Ok(claimId);
+    }
+    [HttpGet("my")]
+    [Authorize(
+    Roles =
+        nameof(UserRole.Patient))]
+    public async Task<IActionResult>
+    GetMyClaims()
+    {
+        var claims =
+            await _mediator.Send(
+                new GetMyClaimsQuery());
+
+        return Ok(claims);
+    }
+    [HttpPost("{claimId}/submit")]
+    [Authorize(
+    Roles =
+        nameof(UserRole.Patient))]
+    public async Task<IActionResult>
+    Submit(
+        Guid claimId)
+    {
+        await _mediator.Send(
+            new SubmitClaimCommand
+            {
+                ClaimId = claimId
+            });
+
+        return NoContent();
+    }
+    [HttpGet("officer-queue")]
+    [Authorize(
+    Roles =
+        nameof(UserRole.ClaimsOfficer))]
+    public async Task<IActionResult>
+    GetOfficerQueue()
+    {
+        var claims =
+            await _mediator.Send(
+                new GetOfficerQueueQuery());
+
+        return Ok(claims);
+    }
+    [HttpPost("{claimId}/start-review")]
+    [Authorize(
+    Roles =
+        nameof(UserRole.ClaimsOfficer))]
+    public async Task<IActionResult>
+    StartReview(
+        Guid claimId)
+    {
+        await _mediator.Send(
+            new StartReviewCommand
+            {
+                ClaimId = claimId
+            });
+
+        return NoContent();
+    }
+    [HttpPost("{claimId}/approve")]
+    [Authorize(
+    Roles =
+        nameof(UserRole.ClaimsOfficer))]
+    public async Task<IActionResult>
+    Approve(
+        Guid claimId)
+    {
+        await _mediator.Send(
+            new ApproveClaimCommand
+            {
+                ClaimId = claimId
+            });
+
+        return NoContent();
+    }
+    [HttpPost("{claimId}/reject")]
+    [Authorize(
+    Roles =
+        nameof(UserRole.ClaimsOfficer))]
+    public async Task<IActionResult>
+    Reject(
+        Guid claimId,
+        RejectClaimCommand command)
+    {
+        command.ClaimId = claimId;
+
+        await _mediator.Send(command);
+
+        return NoContent();
+    }
+    [HttpPost("{claimId}/escalate")]
+    [Authorize(
+    Roles =
+        nameof(UserRole.ClaimsOfficer))]
+    public async Task<IActionResult>
+    Escalate(
+        Guid claimId)
+    {
+        await _mediator.Send(
+            new EscalateClaimCommand
+            {
+                ClaimId = claimId
+            });
+
+        return NoContent();
     }
 }

@@ -24,8 +24,6 @@
   <ItemGroup>
     <Folder Include="Common\DTOs\" />
     <Folder Include="Common\Mappings\" />
-    <Folder Include="Common\Models\" />
-    <Folder Include="Features\Claims\" />
     <Folder Include="Features\Appointments\" />
     <Folder Include="Features\Reports\" />
   </ItemGroup>

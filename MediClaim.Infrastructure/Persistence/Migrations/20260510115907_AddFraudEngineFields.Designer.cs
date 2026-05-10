@@ -4,6 +4,7 @@ using MediClaim.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MediClaim.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260510115907_AddFraudEngineFields")]
+    partial class AddFraudEngineFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,9 +37,6 @@ namespace MediClaim.Infrastructure.Persistence.Migrations
                     b.Property<decimal?>("ApprovedAmount")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<Guid?>("AssignedOfficerId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -56,23 +56,14 @@ namespace MediClaim.Infrastructure.Persistence.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("PendingAssignment")
-                        .HasColumnType("bit");
-
                     b.Property<Guid>("PolicyId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("ProviderId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("RejectionReason")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("RequiresFraudReview")
                         .HasColumnType("bit");
-
-                    b.Property<DateTime?>("ReviewedAt")
-                        .HasColumnType("datetime2");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -95,8 +86,6 @@ namespace MediClaim.Infrastructure.Persistence.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("ClaimId");
-
-                    b.HasIndex("AssignedOfficerId");
 
                     b.HasIndex("PolicyId");
 
@@ -271,7 +260,7 @@ namespace MediClaim.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("Providers");
+                    b.ToTable("Provider");
                 });
 
             modelBuilder.Entity("MediClaim.Domain.Entities.RefreshToken", b =>
@@ -395,9 +384,6 @@ namespace MediClaim.Infrastructure.Persistence.Migrations
                     b.Property<bool>("IsOnLeave")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime?>("LastAssignedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<DateTime?>("LockedAt")
                         .HasColumnType("datetime2");
 
@@ -429,11 +415,6 @@ namespace MediClaim.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("MediClaim.Domain.Entities.Claim", b =>
                 {
-                    b.HasOne("MediClaim.Domain.Entities.User", "AssignedOfficer")
-                        .WithMany()
-                        .HasForeignKey("AssignedOfficerId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("MediClaim.Domain.Entities.Policy", "Policy")
                         .WithMany()
                         .HasForeignKey("PolicyId")
@@ -456,8 +437,6 @@ namespace MediClaim.Infrastructure.Persistence.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("AssignedOfficer");
 
                     b.Navigation("Policy");
 

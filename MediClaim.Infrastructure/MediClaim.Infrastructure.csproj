@@ -34,7 +34,6 @@
 
   <ItemGroup>
     <Folder Include="Identity\" />
-    <Folder Include="BackgroundJobs\" />
     <Folder Include="Email\" />
     <Folder Include="Caching\" />
     <Folder Include="Persistence\Migrations\" />

@@ -25,4 +25,7 @@ public class User : TenantEntity
 
     public bool IsOnLeave { get; set; }
     public byte[] SsnEncrypted { get; set; } = default!;
+    public DateTime? LastAssignedAt {
+        get; set;
+    }
 }

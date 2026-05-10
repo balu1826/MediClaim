@@ -22,7 +22,7 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<Claim> Claims=> Set<Claim>();
     public DbSet<PolicyType>PolicyTypes=> Set<PolicyType>();
     public DbSet<Policy> Policies=> Set<Policy>();
-
+    public DbSet<Provider> Providers => Set<Provider>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     protected override void OnModelCreating(
