@@ -7,6 +7,10 @@ using MediClaim.Infrastructure.Security;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 
 namespace MediClaim.Infrastructure;
 
@@ -18,13 +22,51 @@ public static class DependencyInjection
             IConfiguration configuration)
     {
         services.AddHttpContextAccessor();
+        var jwtSettings =
+    configuration
+        .GetSection("Jwt")
+        .Get<JwtSettings>();
 
+        services
+            .AddAuthentication(
+                JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters =
+                    new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+
+                        ValidateAudience = true,
+
+                        ValidateLifetime = true,
+
+                        ValidateIssuerSigningKey = true,
+
+                        ValidIssuer =
+                            jwtSettings!.Issuer,
+
+                        ValidAudience =
+                            jwtSettings.Audience,
+
+                        IssuerSigningKey =
+                            new SymmetricSecurityKey(
+                                Encoding.UTF8.GetBytes(
+                                    jwtSettings.Key))
+                    };
+            });
+        services.AddAuthorization();
         services.AddScoped<
             ICurrentTenantService,
             CurrentTenantService>();
 
         services.AddScoped<
             AuditableEntityInterceptor>();
+        services.Configure<JwtSettings>(
+            configuration.GetSection("Jwt"));
+        services.AddScoped<
+            IJwtTokenGenerator,
+            JwtTokenGenerator>();
 
         services.AddDbContext<ApplicationDbContext>(
             (sp, options) =>

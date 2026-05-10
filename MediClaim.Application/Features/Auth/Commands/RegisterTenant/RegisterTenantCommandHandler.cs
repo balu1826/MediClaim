@@ -52,12 +52,12 @@ public class RegisterTenantCommandHandler
                 "Tenant slug already exists");
         }
 
-        var emailExists =
+        var user =
             await _userRepository
                 .EmailExistsAsync(
                     request.AdminEmail);
 
-        if (emailExists)
+        if (user is not null)
         {
             throw new ConflictException(
                 "Admin email already exists");
