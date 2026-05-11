@@ -54,5 +54,9 @@ public class PolicyConfiguration
       .HasForeignKey(
           x => x.TenantId)
       .OnDelete(DeleteBehavior.Restrict);
+        builder.Property(
+    x => x.RemainingLimit)
+    .HasColumnType(
+        "decimal(18,2)");
     }
 }

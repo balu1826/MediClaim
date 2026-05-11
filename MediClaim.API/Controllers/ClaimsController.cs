@@ -6,6 +6,7 @@ using MediClaim.Application.Features.Claims.EscalateClaim;
 using MediClaim.Application.Features.Claims.GetMyClaims;
 using MediClaim.Application.Features.Claims.GetOfficerQueue;
 using MediClaim.Application.Features.Claims.RejectClaim;
+using MediClaim.Application.Features.Claims.SettleClaim;
 using MediClaim.Application.Features.Claims.StartReview;
 using MediClaim.Application.Features.Claims.SubmitClaim;
 using MediClaim.Domain.Enums;
@@ -147,5 +148,21 @@ public class ClaimsController
             });
 
         return NoContent();
+    }
+    [HttpPost("{claimId}/settle")]
+    [Authorize(
+    Roles =
+        nameof(UserRole.TenantAdmin))]
+    public async Task<IActionResult>
+    Settle(
+        Guid claimId)
+    {
+        await _mediator.Send(
+            new SettleClaimCommand
+            {
+                ClaimId = claimId
+            });
+
+        return Ok();
     }
 }

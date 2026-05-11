@@ -69,4 +69,8 @@ public class Policy
     {
         get; set;
     } = default!;
+    public decimal RemainingLimit
+    {
+        get; set;
+    }
 }

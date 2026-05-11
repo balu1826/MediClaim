@@ -6,6 +6,7 @@ using MediClaim.Infrastructure.Persistence;
 using MediClaim.Infrastructure.Persistence.Interceptors;
 using MediClaim.Infrastructure.Repositories;
 using MediClaim.Infrastructure.Security;
+using MediClaim.Infrastructure.Settlement;
 using MediClaim.Infrastructure.Workflow;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -97,6 +98,7 @@ public static class DependencyInjection
         services.AddScoped<IFraudScoringService,FraudScoringService>();
         services.AddScoped<IFraudScoringService,FraudScoringService>();
         services.AddScoped<IClaimAssignmentService, ClaimAssignmentService>();
+        services.AddScoped<IClaimSettlementService,ClaimSettlementService>();
         services.AddScoped<
     IFraudRuleEvaluator,
     FrequentClaimRuleEvaluator>();
