@@ -1,12 +1,13 @@
 ﻿using MediatR;
-using System.IdentityModel.Tokens.Jwt;
+using MediClaim.Application.Common.Interfaces;
 using MediClaim.Application.Features.Auth.Commands.Login;
 using MediClaim.Application
     .Features.Auth.Commands.RegisterTenant;
+using MediClaim.Application.Features.Auth.RefreshToken;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using MediClaim.Application.Common.Interfaces;
 
 namespace MediClaim.API.Controllers;
 
@@ -43,6 +44,16 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Login(
        LoginCommand command)
     {
+        command.IpAddress =
+           HttpContext
+               .Connection
+               .RemoteIpAddress
+               ?.ToString();
+
+        command.UserAgent =
+            Request.Headers[
+                "User-Agent"]
+                    .ToString();
         var result =
             await _mediator.Send(command);
 
@@ -70,5 +81,39 @@ public class AuthController : ControllerBase
             TenantId = tenantId,
             Role = role
         });
+    }
+    [HttpPost("refresh")]
+    [AllowAnonymous]
+    public async Task<IActionResult>
+    Refresh(
+        RefreshTokenCommand command)
+    {
+        command.IpAddress =
+            HttpContext
+                .Connection
+                .RemoteIpAddress
+                ?.ToString();
+
+        command.UserAgent =
+            Request.Headers[
+                "User-Agent"]
+                    .ToString();
+
+        try
+        {
+            var response =
+                await _mediator.Send(
+                    command);
+
+            return Ok(response);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Unauthorized(
+                new
+                {
+                    error = ex.Message
+                });
+        }
     }
 }

@@ -101,6 +101,8 @@ public static class DependencyInjection
         services.AddScoped<IClaimAssignmentService, ClaimAssignmentService>();
         services.AddScoped<IClaimSettlementService,ClaimSettlementService>();
         services.AddScoped<IPolicyUpgradeService,PolicyUpgradeService>();
+        services.AddScoped<IRefreshTokenService,RefreshTokenService>();
+        services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<
     IFraudRuleEvaluator,
     FrequentClaimRuleEvaluator>();

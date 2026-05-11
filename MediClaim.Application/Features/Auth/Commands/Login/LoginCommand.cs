@@ -13,4 +13,13 @@ public class LoginCommand
 
     public string Password { get; set; }
         = default!;
+    public string? IpAddress
+    {
+        get; set;
+    }
+
+    public string? UserAgent
+    {
+        get; set;
+    }
 }
