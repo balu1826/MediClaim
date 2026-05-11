@@ -23,6 +23,7 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<PolicyType>PolicyTypes=> Set<PolicyType>();
     public DbSet<Policy> Policies=> Set<Policy>();
     public DbSet<Provider> Providers => Set<Provider>();
+    public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     protected override void OnModelCreating(

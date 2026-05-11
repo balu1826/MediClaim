@@ -49,7 +49,7 @@ builder.Services.AddSwaggerGen(options =>
             ] = new List<string>()
         });
 });
-
+builder.Services.AddMemoryCache();
 builder.Services.AddAuthorization();
 var app = builder.Build();
 
@@ -67,9 +67,14 @@ if (app.Environment.IsDevelopment())
         options.RoutePrefix = string.Empty;
     });
 }
+app.UseMiddleware<CorrelationIdMiddleware>();
+app.UseMiddleware<RequestTimingMiddleware>();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseMiddleware<AuditRequestMiddleware>();
 app.UseHttpsRedirection();
 app.UseAuthentication();
+app.UseMiddleware<TenantResolutionMiddleware>();
+app.UseMiddleware<RateLimitingMiddleware>();
 app.UseAuthorization();
 
 app.MapControllers();

@@ -30,6 +30,10 @@ public class CurrentTenantService
                 ? null
                 : Guid.Parse(tenantId);
         }
+        set
+        {
+            TenantId = value;
+        }
     }
 
     public bool IsSuperAdmin =>

@@ -2,7 +2,7 @@
 {
     public interface ICurrentTenantService
     {
-        Guid? TenantId { get; }
+        Guid? TenantId { get; set; }
 
         bool IsSuperAdmin { get; }
     }

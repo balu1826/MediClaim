@@ -14,6 +14,8 @@ public interface IApplicationDbContext
     DbSet<PolicyType>  PolicyTypes  { get; }
     DbSet<Policy> Policies { get; }
     DbSet<Provider> Providers { get; }
+    DbSet<AuditLog> AuditLogs { get; }
+
 
     Task<int> SaveChangesAsync(
         CancellationToken cancellationToken);
