@@ -175,6 +175,40 @@ public class RefreshTokenService
         };
     }
 
+    public async Task RevokeAsync(
+    string refreshToken,
+    CancellationToken cancellationToken)
+    {
+        var tokenHash =
+            RefreshTokenHasher
+                .Hash(refreshToken);
+
+        var token =
+            await _context.RefreshTokens
+                .FirstOrDefaultAsync(
+                    x =>
+                        x.TokenHash ==
+                            tokenHash,
+                    cancellationToken);
+
+        if (token is null)
+        {
+            return;
+        }
+
+        token.IsRevoked = true;
+
+        token.RevokedAt =
+            DateTime.UtcNow;
+
+        token.RevokedReason =
+            "Logout";
+
+        await _unitOfWork
+            .SaveChangesAsync(
+                cancellationToken);
+    }
+
     private async Task
         HandleReuseDetectionAsync(
             RefreshToken reusedToken,

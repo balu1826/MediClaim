@@ -12,4 +12,7 @@ public interface IRefreshTokenService
             string? ipAddress,
             string? userAgent,
             CancellationToken cancellationToken);
+    Task RevokeAsync(
+    string refreshToken,
+    CancellationToken cancellationToken);
 }

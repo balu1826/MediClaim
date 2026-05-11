@@ -4,6 +4,9 @@ using MediClaim.Application.Features.Auth.Commands.Login;
 using MediClaim.Application
     .Features.Auth.Commands.RegisterTenant;
 using MediClaim.Application.Features.Auth.RefreshToken;
+using MediClaim.Application.Features.Auth.RevokeToken;
+using MediClaim.Application.Features.Auth.UnlockUser;
+using MediClaim.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
@@ -59,28 +62,16 @@ public class AuthController : ControllerBase
 
         return Ok(result);
     }
+    [HttpPost("revoke")]
     [Authorize]
-    [HttpGet("me")]
-    public IActionResult Me()
+    public async Task<IActionResult>
+       Revoke(
+           RevokeRefreshTokenCommand command)
     {
-        var userId =
-            _currentUserService.UserId;
+        await _mediator.Send(
+            command);
 
-        var email =
-           _currentUserService.Email;
-        var tenantId =
-            _currentUserService.TenantId;
-
-        var role =
-            _currentUserService.Role;
-
-        return Ok(new
-        {
-            UserId = userId,
-            Email = email,
-            TenantId = tenantId,
-            Role = role
-        });
+        return NoContent();
     }
     [HttpPost("refresh")]
     [AllowAnonymous]
@@ -115,5 +106,21 @@ public class AuthController : ControllerBase
                     error = ex.Message
                 });
         }
+    }
+    [HttpPost("unlock/{userId}")]
+    [Authorize(
+    Roles =
+        nameof(UserRole.TenantAdmin))]
+    public async Task<IActionResult>
+    Unlock(
+        Guid userId)
+    {
+        await _mediator.Send(
+            new UnlockUserCommand
+            {
+                UserId = userId
+            });
+
+        return NoContent();
     }
 }
