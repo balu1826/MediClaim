@@ -2,6 +2,7 @@
 using MediClaim.Application
     .Features.Policies.CreatePolicyType;
 using MediClaim.Application.Features.Policies.EnrollPolicy;
+using MediClaim.Application.Features.Policies.UpgradePolicy;
 using MediClaim.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -50,5 +51,22 @@ public class PoliciesController
                 .Send(command);
 
         return Ok(policyId);
+    }
+    [HttpPost("{policyId}/upgrade")]
+    [Authorize(
+    Roles =
+        nameof(UserRole.TenantAdmin))]
+    public async Task<IActionResult>
+    Upgrade(
+        Guid policyId,
+        UpgradePolicyCommand command)
+    {
+        command.PolicyId =
+            policyId;
+
+        await _mediator.Send(
+            command);
+
+        return NoContent();
     }
 }

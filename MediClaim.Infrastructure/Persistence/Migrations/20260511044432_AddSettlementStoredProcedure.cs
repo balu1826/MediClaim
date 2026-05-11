@@ -64,7 +64,9 @@ BEGIN
 
         UPDATE Policies
         SET UsedAmount =
-            UsedAmount + @ApprovedAmount
+            UsedAmount + @ApprovedAmount,
+    RemainingLimit =
+        RemainingLimit - @ApprovedAmount
         WHERE PolicyId = @PolicyId;
 
         UPDATE Claims

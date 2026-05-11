@@ -122,7 +122,9 @@ public class EnrollPolicyCommandHandler
                     request.StartDate,
 
                 EndDate =
-                    request.EndDate
+                    request.EndDate,
+                RemainingLimit =
+                 policyType.AnnualCoverageLimit,
             };
 
         _context.Policies

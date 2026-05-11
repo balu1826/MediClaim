@@ -4,6 +4,7 @@ using MediClaim.Infrastructure.FraudDetection.Rules;
 using MediClaim.Infrastructure.MultiTenancy;
 using MediClaim.Infrastructure.Persistence;
 using MediClaim.Infrastructure.Persistence.Interceptors;
+using MediClaim.Infrastructure.Policies;
 using MediClaim.Infrastructure.Repositories;
 using MediClaim.Infrastructure.Security;
 using MediClaim.Infrastructure.Settlement;
@@ -99,6 +100,7 @@ public static class DependencyInjection
         services.AddScoped<IFraudScoringService,FraudScoringService>();
         services.AddScoped<IClaimAssignmentService, ClaimAssignmentService>();
         services.AddScoped<IClaimSettlementService,ClaimSettlementService>();
+        services.AddScoped<IPolicyUpgradeService,PolicyUpgradeService>();
         services.AddScoped<
     IFraudRuleEvaluator,
     FrequentClaimRuleEvaluator>();
