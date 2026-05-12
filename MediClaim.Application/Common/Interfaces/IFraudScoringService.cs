@@ -6,6 +6,6 @@ namespace MediClaim.Application.Common.Interfaces
     {
         Task<FraudEvaluationResult>
        EvaluateAsync(
-           MediClaim.Domain.Entities.Claim claim);
+           MediClaim.Domain.Entities.Claim claim, CancellationToken cancellationToken);
     }
 }

@@ -25,7 +25,7 @@ public class EarlySubmissionRuleEvaluator
 
     public async Task<int>
         EvaluateAsync(
-            Claim claim)
+            Claim claim, CancellationToken cancellationToken)
     {
         var policy =
             await _context.Policies

@@ -1,8 +1,10 @@
-using Microsoft.AspNetCore.Authorization;
+using Hangfire;
 using MediClaim.API.Middleware;
 using MediClaim.Application;
 using MediClaim.Infrastructure;
+using MediClaim.Infrastructure.BackgroundJobs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using System.Text;
@@ -12,7 +14,17 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
+//Hangfire configuration
+builder.Services
+    .AddHangfire(configuration =>
+        configuration
+            .UseSqlServerStorage(
+                builder.Configuration
+                    .GetConnectionString(
+                        "DefaultConnection")));
 
+builder.Services
+    .AddHangfireServer();
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 
@@ -52,6 +64,40 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddMemoryCache();
 builder.Services.AddAuthorization();
 var app = builder.Build();
+using (var scope =
+    app.Services.CreateScope())
+{
+    var recurringJobManager =
+        scope.ServiceProvider
+            .GetRequiredService<
+                IRecurringJobManager>();
+
+    recurringJobManager
+        .AddOrUpdate<
+            StaleDocumentAutoRejectJob>(
+                "stale-document-auto-reject-job",
+                x => x.ExecuteAsync(
+                    CancellationToken.None),
+                "0 6 * * *",
+                new RecurringJobOptions
+                {
+                    TimeZone =
+                        TimeZoneInfo.Utc
+                });
+
+    recurringJobManager
+        .AddOrUpdate<
+            FraudScoreRecalculationJob>(
+                "fraud-score-recalculation-job",
+                x => x.ExecuteAsync(
+                    CancellationToken.None),
+                "0 2 * * *",
+                new RecurringJobOptions
+                {
+                    TimeZone =
+                        TimeZoneInfo.Utc
+                });
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -67,16 +113,15 @@ if (app.Environment.IsDevelopment())
         options.RoutePrefix = string.Empty;
     });
 }
+app.UseHttpsRedirection();
 app.UseMiddleware<CorrelationIdMiddleware>();
 app.UseMiddleware<RequestTimingMiddleware>();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseMiddleware<AuditRequestMiddleware>();
-app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseMiddleware<TenantResolutionMiddleware>();
 app.UseMiddleware<RateLimitingMiddleware>();
 app.UseAuthorization();
-
+app.UseHangfireDashboard("/hangfire");
 app.MapControllers();
-
 app.Run();

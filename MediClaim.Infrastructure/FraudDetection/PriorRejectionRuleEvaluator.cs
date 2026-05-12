@@ -26,7 +26,7 @@ public class PriorRejectionRuleEvaluator
 
     public async Task<int>
         EvaluateAsync(
-            Claim claim)
+            Claim claim, CancellationToken cancellationToken)
     {
         var since =
             DateTime.UtcNow

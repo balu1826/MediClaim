@@ -26,7 +26,7 @@ public class ProviderRejectionRateRuleEvaluator
 
     public async Task<int>
         EvaluateAsync(
-            Claim claim)
+            Claim claim, CancellationToken cancellationToken)
     {
         if (claim.ProviderId is null)
         {

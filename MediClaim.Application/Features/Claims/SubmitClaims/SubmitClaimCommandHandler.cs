@@ -79,7 +79,7 @@ public class SubmitClaimCommandHandler
 
         var fraudResult =
             await _fraudScoringService
-                .EvaluateAsync(claim);
+                .EvaluateAsync(claim, cancellationToken);
 
         claim.FraudRiskScore =
             fraudResult.Score;

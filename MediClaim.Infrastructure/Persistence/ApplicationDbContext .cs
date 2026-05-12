@@ -25,6 +25,13 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<Provider> Providers => Set<Provider>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<JobExecutionLog>
+     JobExecutionLogs =>
+         Set<JobExecutionLog>();
+
+    public DbSet<ClaimStatusHistory>
+        ClaimStatusHistories =>
+            Set<ClaimStatusHistory>();
 
     protected override void OnModelCreating(
     ModelBuilder modelBuilder)

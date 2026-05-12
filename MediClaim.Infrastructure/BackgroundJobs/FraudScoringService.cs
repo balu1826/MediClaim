@@ -25,7 +25,7 @@ public class FraudScoringService
     public async Task<
         FraudEvaluationResult>
             EvaluateAsync(
-                Claim claim)
+                Claim claim, CancellationToken cancellationToken)
     {
         var totalScore = 0;
 
@@ -38,7 +38,7 @@ public class FraudScoringService
             var score =
                 await evaluator
                     .EvaluateAsync(
-                        claim);
+                        claim, cancellationToken);
 
             totalScore += score;
 

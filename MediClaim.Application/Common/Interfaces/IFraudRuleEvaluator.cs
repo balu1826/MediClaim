@@ -10,5 +10,5 @@ public interface IFraudRuleEvaluator
         get;
     }
     Task<int> EvaluateAsync(
-        Claim claim);
+        Claim claim, CancellationToken cancellationToken);
 }

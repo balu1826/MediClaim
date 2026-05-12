@@ -15,6 +15,17 @@ public interface IApplicationDbContext
     DbSet<Policy> Policies { get; }
     DbSet<Provider> Providers { get; }
     DbSet<AuditLog> AuditLogs { get; }
+    DbSet<JobExecutionLog>
+    JobExecutionLogs
+    {
+        get;
+    }
+
+    DbSet<ClaimStatusHistory>
+        ClaimStatusHistories
+    {
+        get;
+    }
 
 
     Task<int> SaveChangesAsync(

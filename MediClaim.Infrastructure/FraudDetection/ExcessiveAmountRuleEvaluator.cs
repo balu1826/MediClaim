@@ -26,7 +26,7 @@ public class ExcessiveAmountRuleEvaluator
 
     public async Task<int>
         EvaluateAsync(
-            Claim claim)
+            Claim claim, CancellationToken cancellationToken)
     {
         var approvedAmounts =
             await _context.Claims
