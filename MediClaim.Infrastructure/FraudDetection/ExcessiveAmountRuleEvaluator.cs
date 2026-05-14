@@ -8,25 +8,18 @@ using Microsoft.EntityFrameworkCore;
 namespace MediClaim.Infrastructure
     .FraudDetection.Rules;
 
-public class ExcessiveAmountRuleEvaluator
-    : IFraudRuleEvaluator
+public class ExcessiveAmountRuleEvaluator: IFraudRuleEvaluator
 {
-    private readonly ApplicationDbContext
-        _context;
-
+    private readonly ApplicationDbContext _context;
     public ExcessiveAmountRuleEvaluator(
         ApplicationDbContext context)
     {
         _context = context;
     }
-
-    public string RuleName =>
-        nameof(
-            ExcessiveAmountRuleEvaluator);
-
-    public async Task<int>
-        EvaluateAsync(
-            Claim claim, CancellationToken cancellationToken)
+    public string RuleName => GetType().Name;
+    public async Task<int> EvaluateAsync(
+            Claim claim, 
+            CancellationToken cancellationToken)
     {
         var approvedAmounts =
             await _context.Claims
@@ -41,20 +34,26 @@ public class ExcessiveAmountRuleEvaluator
                 .Select(x =>
                     x.ApprovedAmount!.Value)
                 .OrderBy(x => x)
-                .ToListAsync();
-
+                .ToListAsync(cancellationToken);
         if (!approvedAmounts.Any())
         {
             return 0;
         }
+        var count = approvedAmounts.Count;
 
-        var median =
-            approvedAmounts[
-                approvedAmounts.Count / 2];
-
-        return claim.Amount >
-            (median * 1.5m)
-                ? 20
-                : 0;
+        decimal median;
+        if (count % 2 == 0)
+        {
+            median =
+                (
+                    approvedAmounts[(count / 2) - 1]
+                    + approvedAmounts[count / 2]
+                ) / 2;
+        }
+        else
+        {
+            median = approvedAmounts[count / 2];
+        }
+        return claim.Amount > (median * 1.5m) ? 20 : 0;
     }
 }

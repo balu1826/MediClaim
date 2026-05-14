@@ -7,24 +7,17 @@ using Microsoft.EntityFrameworkCore;
 namespace MediClaim.Infrastructure
     .FraudDetection.Rules;
 
-public class FrequentClaimRuleEvaluator
-    : IFraudRuleEvaluator
-{
-    private readonly ApplicationDbContext
-        _context;
+public class FrequentClaimRuleEvaluator : IFraudRuleEvaluator
 
+{
+    private readonly ApplicationDbContext _context;
     public FrequentClaimRuleEvaluator(
         ApplicationDbContext context)
     {
         _context = context;
     }
-
-    public string RuleName =>
-        nameof(
-            FrequentClaimRuleEvaluator);
-
-    public async Task<int>
-        EvaluateAsync(
+    public string RuleName => GetType().Name;
+    public async Task<int> EvaluateAsync(
             Claim claim, CancellationToken cancellationToken)
     {
         var since =
@@ -45,9 +38,6 @@ public class FrequentClaimRuleEvaluator
                     x.ProviderId)
                 .Distinct()
                 .CountAsync();
-
-        return claims > 3
-            ? 25
-            : 0;
+        return claims > 3 ? 25 : 0; 
     }
 }

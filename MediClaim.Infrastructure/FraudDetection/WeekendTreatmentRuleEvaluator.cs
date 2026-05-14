@@ -3,6 +3,7 @@
 using MediClaim.Domain.Entities;
 using MediClaim.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using MediClaim.Application.Common.Exceptions;
 
 namespace MediClaim.Infrastructure
     .FraudDetection.Rules;
@@ -18,36 +19,22 @@ public class WeekendTreatmentRuleEvaluator
     {
         _context = context;
     }
-
-    public string RuleName =>
-        nameof(
-            WeekendTreatmentRuleEvaluator);
-
-    public async Task<int>
-        EvaluateAsync(
-            Claim claim, CancellationToken cancellationToken)
+    public string RuleName => GetType().Name;
+    public async Task<int> EvaluateAsync(
+            Claim claim,
+            CancellationToken cancellationToken)
     {
         if (claim.ProviderId is null)
         {
-            return 0;
+            throw new BadRequestException("ProviderId is required.");
         }
-
         var provider =
             await _context.Providers
-                .FirstOrDefaultAsync(
+                .SingleAsync(
                     x =>
                         x.ProviderId ==
                             claim.ProviderId);
-
-        if (provider is null)
-        {
-            return 0;
-        }
-
-        var day =
-            claim.TreatmentDate
-                .DayOfWeek;
-
+        var day = claim.TreatmentDate.DayOfWeek;
         var weekend =
             day == DayOfWeek.Saturday
             || day == DayOfWeek.Sunday;

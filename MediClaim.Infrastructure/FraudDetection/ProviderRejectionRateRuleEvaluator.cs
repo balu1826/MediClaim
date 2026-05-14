@@ -8,35 +8,26 @@ using Microsoft.EntityFrameworkCore;
 namespace MediClaim.Infrastructure
     .FraudDetection.Rules;
 
-public class ProviderRejectionRateRuleEvaluator
-    : IFraudRuleEvaluator
-{
-    private readonly ApplicationDbContext
-        _context;
+public class ProviderRejectionRateRuleEvaluator : IFraudRuleEvaluator
 
+{
+    private readonly ApplicationDbContext _context;
     public ProviderRejectionRateRuleEvaluator(
         ApplicationDbContext context)
     {
         _context = context;
     }
-
-    public string RuleName =>
-        nameof(
-            ProviderRejectionRateRuleEvaluator);
-
-    public async Task<int>
-        EvaluateAsync(
-            Claim claim, CancellationToken cancellationToken)
+    public string RuleName => GetType().Name;
+    public async Task<int> EvaluateAsync(
+            Claim claim, 
+            CancellationToken cancellationToken)
     {
         if (claim.ProviderId is null)
         {
             return 0;
         }
-
-        var since =
-            DateTime.UtcNow
+        var since = DateTime.UtcNow
                 .AddMonths(-6);
-
         var claims =
             await _context.Claims
                 .Where(x =>
@@ -45,8 +36,7 @@ public class ProviderRejectionRateRuleEvaluator
                     && x.TenantId ==
                         claim.TenantId
                     && x.CreatedAt >= since)
-                .ToListAsync();
-
+                .ToListAsync(cancellationToken);
         if (!claims.Any())
         {
             return 0;
