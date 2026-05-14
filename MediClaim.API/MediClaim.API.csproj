@@ -7,6 +7,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Extensions\**" />
+    <Compile Remove="Filters\**" />
+    <Compile Remove="Swagger\**" />
+    <Content Remove="Extensions\**" />
+    <Content Remove="Filters\**" />
+    <Content Remove="Swagger\**" />
+    <EmbeddedResource Remove="Extensions\**" />
+    <EmbeddedResource Remove="Filters\**" />
+    <EmbeddedResource Remove="Swagger\**" />
+    <None Remove="Extensions\**" />
+    <None Remove="Filters\**" />
+    <None Remove="Swagger\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Hangfire" Version="1.8.23" />
     <PackageReference Include="Hangfire.AspNetCore" Version="1.8.23" />
     <PackageReference Include="Hangfire.SqlServer" Version="1.8.23" />
@@ -21,12 +36,6 @@
   <ItemGroup>
     <ProjectReference Include="..\MediClaim.Application\MediClaim.Application.csproj" />
     <ProjectReference Include="..\MediClaim.Infrastructure\MediClaim.Infrastructure.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Extensions\" />
-    <Folder Include="Filters\" />
-    <Folder Include="Swagger\" />
   </ItemGroup>
 
 </Project>

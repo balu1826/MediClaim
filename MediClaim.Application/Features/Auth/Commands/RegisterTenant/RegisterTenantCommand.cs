@@ -19,4 +19,9 @@ public class RegisterTenantCommand
         = default!;
     public string Ssn { get; set; }
     = default!;
+    public int FraudThreshold
+    {
+        get;
+        set;
+    }
 }

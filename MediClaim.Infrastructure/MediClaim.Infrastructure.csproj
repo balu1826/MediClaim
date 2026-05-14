@@ -7,6 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Caching\**" />
+    <Compile Remove="Email\**" />
+    <Compile Remove="Identity\**" />
+    <EmbeddedResource Remove="Caching\**" />
+    <EmbeddedResource Remove="Email\**" />
+    <EmbeddedResource Remove="Identity\**" />
+    <None Remove="Caching\**" />
+    <None Remove="Email\**" />
+    <None Remove="Identity\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.1.0" />
     <PackageReference Include="Hangfire" Version="1.8.23" />
     <PackageReference Include="Hangfire.SqlServer" Version="1.8.23" />
@@ -33,9 +45,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Identity\" />
-    <Folder Include="Email\" />
-    <Folder Include="Caching\" />
     <Folder Include="Persistence\Migrations\" />
     <Folder Include="Storage\" />
   </ItemGroup>

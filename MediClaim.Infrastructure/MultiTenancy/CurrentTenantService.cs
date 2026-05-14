@@ -26,13 +26,11 @@ public class CurrentTenantService
                     .FindFirst("tenant_id")
                     ?.Value;
 
-            return tenantId is null
-                ? null
-                : Guid.Parse(tenantId);
-        }
-        set
-        {
-            TenantId = value;
+            return Guid.TryParse(
+                tenantId,
+                out var parsedTenantId)
+                ? parsedTenantId
+                : null;
         }
     }
 

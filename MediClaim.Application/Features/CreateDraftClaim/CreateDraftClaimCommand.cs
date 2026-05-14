@@ -10,6 +10,10 @@ public class CreateDraftClaimCommand
     {
         get; set;
     }
+    public Guid ProviderId
+    {
+        get; set;
+    }
 
     public decimal Amount
     {

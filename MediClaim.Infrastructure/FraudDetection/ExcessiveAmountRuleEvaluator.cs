@@ -16,7 +16,7 @@ public class ExcessiveAmountRuleEvaluator: IFraudRuleEvaluator
     {
         _context = context;
     }
-    public string RuleName => GetType().Name;
+    public string RuleName => nameof(ExcessiveAmountRuleEvaluator);
     public async Task<int> EvaluateAsync(
             Claim claim, 
             CancellationToken cancellationToken)

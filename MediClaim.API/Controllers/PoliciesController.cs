@@ -52,7 +52,7 @@ public class PoliciesController
 
         return Ok(policyId);
     }
-    [HttpPost("{policyId}/upgrade")]
+    [HttpPut("{policyId}/upgrade")]
     [Authorize(
     Roles =
         nameof(UserRole.TenantAdmin))]

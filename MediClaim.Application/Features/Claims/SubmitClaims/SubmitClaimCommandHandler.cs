@@ -33,11 +33,8 @@ public class SubmitClaimCommandHandler
         IFraudScoringService fraudScoringService,IClaimAssignmentService claimAssignmentService)
     {
         _context = context;
-
-        _currentUserService =
-            currentUserService;
+        _currentUserService = currentUserService;
         _fraudScoringService = fraudScoringService;
-
         _unitOfWork = unitOfWork;
         _claimAssignmentService = claimAssignmentService;
     }
@@ -46,14 +43,8 @@ public class SubmitClaimCommandHandler
         SubmitClaimCommand request,
         CancellationToken cancellationToken)
     {
-        var userId =
-            _currentUserService
-                .UserId;
-
-        var tenantId =
-            _currentUserService
-                .TenantId;
-
+        var userId = _currentUserService.UserId;
+        var tenantId = _currentUserService.TenantId;
         var claim =
             await _context.Claims
                 .FirstOrDefaultAsync(
@@ -81,20 +72,14 @@ public class SubmitClaimCommandHandler
             await _fraudScoringService
                 .EvaluateAsync(claim, cancellationToken);
 
-        claim.FraudRiskScore =
-            fraudResult.Score;
-
-        claim.RequiresFraudReview =
-            fraudResult.RequiresReview;
+        claim.FraudRiskScore = fraudResult.Score;
+        claim.RequiresFraudReview = fraudResult.RequiresReview;
+        claim.SubmittedAt = DateTime.UtcNow;
         // Officer assignment
-
-        await _claimAssignmentService
-            .AssignAsync(
+        await _claimAssignmentService.AssignAsync(
                 claim,
                 cancellationToken);
-
-        await _unitOfWork
-            .SaveChangesAsync(
+        await _unitOfWork.SaveChangesAsync(
                 cancellationToken);
     }
 }

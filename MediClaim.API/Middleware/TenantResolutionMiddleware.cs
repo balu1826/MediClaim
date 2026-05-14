@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using MediClaim.Application.Common.Exceptions;
 using MediClaim.Application
     .Common.Interfaces;
 using MediClaim.Domain.Enums;
@@ -9,9 +10,7 @@ namespace MediClaim.API
 
 public class TenantResolutionMiddleware
 {
-    private readonly RequestDelegate
-        _next;
-
+    private readonly RequestDelegate _next;
     public TenantResolutionMiddleware(
         RequestDelegate next)
     {
@@ -23,13 +22,10 @@ public class TenantResolutionMiddleware
         ICurrentTenantService currentTenantService,
         IApplicationDbContext dbContext)
     {
-        var path =
-            context.Request.Path
+        var path = context.Request.Path
                 .Value?
                 .ToLower();
-
         // Skip auth endpoints
-
         if (path is not null
             &&
             (
@@ -41,52 +37,28 @@ public class TenantResolutionMiddleware
             ))
         {
             await _next(context);
-
             return;
         }
-
         // Skip unauthenticated users
-
         if (!(context.User
             ?.Identity
             ?.IsAuthenticated ?? false))
         {
             await _next(context);
-
             return;
         }
 
         // Extract tenant claim
-
         var tenantClaim =
             context.User.FindFirst(
                 "tenant_id")
                     ?.Value;
-
-        if (string.IsNullOrWhiteSpace(
-            tenantClaim))
+        if (string.IsNullOrWhiteSpace(tenantClaim))
         {
-            context.Response.StatusCode =
-                StatusCodes
-                    .Status401Unauthorized;
-
-            await context.Response
-                .WriteAsJsonAsync(
-                    new
-                    {
-                        error =
-                            "Tenant not found"
-                    });
-
-            return;
+            throw new UnauthorizedAccessException("Tenant not found");
         }
-
-        var tenantId =
-            Guid.Parse(
-                tenantClaim);
-
+        var tenantId = Guid.Parse(tenantClaim);
         // Load tenant
-
         var tenant =
             await dbContext.Tenants
                 .FirstOrDefaultAsync(
@@ -96,47 +68,16 @@ public class TenantResolutionMiddleware
 
         if (tenant is null)
         {
-            context.Response.StatusCode =
-                StatusCodes
-                    .Status401Unauthorized;
-
-            await context.Response
-                .WriteAsJsonAsync(
-                    new
-                    {
-                        error =
-                            "Tenant not found"
-                    });
-
-            return;
+            throw new UnauthorizedAccessException("Tenant not found");
         }
 
         // Suspended tenant
 
-        if (tenant.Status ==
-            TenantStatus.Suspended)
+        if (tenant.Status == TenantStatus.Suspended)
         {
-            context.Response.StatusCode =
-                StatusCodes
-                    .Status403Forbidden;
+            throw new ForbiddenAccessException("Tenant Suspended");
 
-            await context.Response
-                .WriteAsJsonAsync(
-                    new
-                    {
-                        error =
-                            "Tenant suspended"
-                    });
-
-            return;
         }
-
-        // Populate tenant context
-
-        currentTenantService
-            .TenantId =
-                tenantId;
-
         await _next(context);
     }
 }

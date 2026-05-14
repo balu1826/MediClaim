@@ -97,6 +97,16 @@ using (var scope =
                     TimeZone =
                         TimeZoneInfo.Utc
                 });
+    RecurringJob.AddOrUpdate<WeeklyClaimsSummaryJob>(
+        "weekly-claims-summary-job",
+        x => x.ExecuteAsync(
+            CancellationToken.None),
+        "0 7 * * 0",
+        new RecurringJobOptions
+        {
+            TimeZone = TimeZoneInfo.Utc
+        });
+
 }
 
 // Configure the HTTP request pipeline.

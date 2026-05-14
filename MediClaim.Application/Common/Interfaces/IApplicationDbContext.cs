@@ -15,18 +15,10 @@ public interface IApplicationDbContext
     DbSet<Policy> Policies { get; }
     DbSet<Provider> Providers { get; }
     DbSet<AuditLog> AuditLogs { get; }
-    DbSet<JobExecutionLog>
-    JobExecutionLogs
-    {
-        get;
-    }
-
-    DbSet<ClaimStatusHistory>
-        ClaimStatusHistories
-    {
-        get;
-    }
-
+    DbSet<JobExecutionLog> JobExecutionLogs { get; }
+    DbSet<Report> Reports { get; }
+    DbSet<ClaimStatusHistory> ClaimStatusHistories { get; }
+    DbSet<ClaimDocument> ClaimDocuments { get; }
 
     Task<int> SaveChangesAsync(
         CancellationToken cancellationToken);

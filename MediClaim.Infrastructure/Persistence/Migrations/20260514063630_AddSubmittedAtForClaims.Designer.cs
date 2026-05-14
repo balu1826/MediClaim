@@ -4,6 +4,7 @@ using MediClaim.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MediClaim.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260514063630_AddSubmittedAtForClaims")]
+    partial class AddSubmittedAtForClaims
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -119,7 +122,7 @@ namespace MediClaim.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("PolicyId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ProviderId")
+                    b.Property<Guid?>("ProviderId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("RejectionReason")
@@ -167,40 +170,6 @@ namespace MediClaim.Infrastructure.Persistence.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Claims");
-                });
-
-            modelBuilder.Entity("MediClaim.Domain.Entities.ClaimDocument", b =>
-                {
-                    b.Property<Guid>("ClaimDocumentId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ClaimId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ContentType")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("FileName")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("FilePath")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<DateTime>("UploadedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("ClaimDocumentId");
-
-                    b.HasIndex("ClaimId");
-
-                    b.ToTable("ClaimDocuments");
                 });
 
             modelBuilder.Entity("MediClaim.Domain.Entities.ClaimStatusHistory", b =>
@@ -655,8 +624,7 @@ namespace MediClaim.Infrastructure.Persistence.Migrations
                     b.HasOne("MediClaim.Domain.Entities.Provider", "Provider")
                         .WithMany()
                         .HasForeignKey("ProviderId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("MediClaim.Domain.Entities.Tenant", "Tenant")
                         .WithMany()
@@ -679,17 +647,6 @@ namespace MediClaim.Infrastructure.Persistence.Migrations
                     b.Navigation("Tenant");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("MediClaim.Domain.Entities.ClaimDocument", b =>
-                {
-                    b.HasOne("MediClaim.Domain.Entities.Claim", "Claim")
-                        .WithMany()
-                        .HasForeignKey("ClaimId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Claim");
                 });
 
             modelBuilder.Entity("MediClaim.Domain.Entities.ClaimStatusHistory", b =>

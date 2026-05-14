@@ -2,8 +2,10 @@
 using MediatR;
 using MediClaim.Application.Common.Exceptions;
 using MediClaim.Application.Common.Interfaces;
+using MediClaim.Domain.Common;
 using MediClaim.Domain.Entities;
 using MediClaim.Domain.Enums;
+using System.Text.Json;
 
 namespace MediClaim.Application
     .Features.Auth.Commands.RegisterTenant;
@@ -62,7 +64,12 @@ public class RegisterTenantCommandHandler
             throw new ConflictException(
                 "Admin email already exists");
         }
-
+        var settings =
+    new TenantSettings
+    {
+        FraudThreshold =
+            request.FraudThreshold
+    };
         var tenant = new Tenant
         {
             TenantId = Guid.NewGuid(),
@@ -71,7 +78,10 @@ public class RegisterTenantCommandHandler
 
             Slug = request.Slug,
 
-            Status = TenantStatus.Active
+            Status = TenantStatus.Active,
+            SettingsJson =
+            JsonSerializer.Serialize(
+                settings)
         };
 
         await _tenantRepository

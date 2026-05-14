@@ -24,6 +24,8 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<Policy> Policies=> Set<Policy>();
     public DbSet<Provider> Providers => Set<Provider>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+    public DbSet<Report> Reports => Set<Report>();
+    public DbSet<ClaimDocument> ClaimDocuments { get; set; }
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
     public DbSet<JobExecutionLog>
      JobExecutionLogs =>

@@ -88,6 +88,7 @@ public class Claim
     {
         get; set;
     }
+    public DateTime SubmittedAt { get; set; }
     public Provider Provider
     {
         get; set;

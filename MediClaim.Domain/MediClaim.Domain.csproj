@@ -7,15 +7,30 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.7" />
+    <Compile Remove="Controllers\**" />
+    <Compile Remove="Events\**" />
+    <Compile Remove="Exceptions\**" />
+    <Compile Remove="Rules\**" />
+    <Compile Remove="ValueObjects\**" />
+    <Content Remove="Controllers\**" />
+    <Content Remove="Events\**" />
+    <Content Remove="Exceptions\**" />
+    <Content Remove="Rules\**" />
+    <Content Remove="ValueObjects\**" />
+    <EmbeddedResource Remove="Controllers\**" />
+    <EmbeddedResource Remove="Events\**" />
+    <EmbeddedResource Remove="Exceptions\**" />
+    <EmbeddedResource Remove="Rules\**" />
+    <EmbeddedResource Remove="ValueObjects\**" />
+    <None Remove="Controllers\**" />
+    <None Remove="Events\**" />
+    <None Remove="Exceptions\**" />
+    <None Remove="Rules\**" />
+    <None Remove="ValueObjects\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-    <Folder Include="Exceptions\" />
-    <Folder Include="Events\" />
-    <Folder Include="ValueObjects\" />
-    <Folder Include="Rules\" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.7" />
   </ItemGroup>
 
 </Project>

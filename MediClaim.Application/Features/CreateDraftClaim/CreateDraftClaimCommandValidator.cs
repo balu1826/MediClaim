@@ -26,5 +26,7 @@ public class CreateDraftClaimCommandValidator
         RuleFor(x => x.Description)
             .NotEmpty()
             .MaximumLength(1000);
+        RuleFor(x => x.ProviderId)
+            .NotNull();
     }
 }

@@ -7,6 +7,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Common\DTOs\**" />
+    <Compile Remove="Common\Mappings\**" />
+    <Compile Remove="Features\Appointments\**" />
+    <Content Remove="Common\DTOs\**" />
+    <Content Remove="Common\Mappings\**" />
+    <Content Remove="Features\Appointments\**" />
+    <EmbeddedResource Remove="Common\DTOs\**" />
+    <EmbeddedResource Remove="Common\Mappings\**" />
+    <EmbeddedResource Remove="Features\Appointments\**" />
+    <None Remove="Common\DTOs\**" />
+    <None Remove="Common\Mappings\**" />
+    <None Remove="Features\Appointments\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.1.0" />
     <PackageReference Include="FluentValidation" Version="12.1.1" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
@@ -22,9 +37,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Common\DTOs\" />
-    <Folder Include="Common\Mappings\" />
-    <Folder Include="Features\Appointments\" />
     <Folder Include="Features\Reports\" />
   </ItemGroup>
 

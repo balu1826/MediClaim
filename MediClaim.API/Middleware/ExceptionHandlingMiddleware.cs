@@ -87,6 +87,20 @@ public class ExceptionHandlingMiddleware
                     conflictException.Message;
 
                 break;
+            case UnprocessableEntityException UnprocessableEntityException:
+                response.StatusCode =
+                   (int)HttpStatusCode.UnprocessableEntity;
+
+                problemDetails.Title =
+                    "UnprocessableEntityException";
+
+                problemDetails.Status =
+                    response.StatusCode;
+
+                problemDetails.Detail =
+                    UnprocessableEntityException.Message;
+
+                break;
 
             default:
 
