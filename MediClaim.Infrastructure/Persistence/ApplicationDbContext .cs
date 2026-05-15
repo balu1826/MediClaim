@@ -3,6 +3,9 @@ using MediClaim.Domain.Common;
 using MediClaim.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using MediClaim.Application.Repositories;
+using MediClaim.Infrastructure.Persistence;
+
 
 namespace MediClaim.Infrastructure.Persistence;
 
@@ -16,6 +19,9 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
         _currentTenantService = currentTenantService;
     }
 
+   
+    
+   
     public DbSet<Tenant> Tenants => Set<Tenant>();
 
     public DbSet<User> Users => Set<User>();
@@ -28,12 +34,13 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<ClaimDocument> ClaimDocuments { get; set; }
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
     public DbSet<JobExecutionLog>
-     JobExecutionLogs =>
-         Set<JobExecutionLog>();
+
+    JobExecutionLogs => Set<JobExecutionLog>();
+
 
     public DbSet<ClaimStatusHistory>
-        ClaimStatusHistories =>
-            Set<ClaimStatusHistory>();
+    ClaimStatusHistories => Set<ClaimStatusHistory>();
+
 
     protected override void OnModelCreating(
     ModelBuilder modelBuilder)
