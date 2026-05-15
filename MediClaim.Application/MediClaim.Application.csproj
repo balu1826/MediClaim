@@ -10,15 +10,19 @@
     <Compile Remove="Common\DTOs\**" />
     <Compile Remove="Common\Mappings\**" />
     <Compile Remove="Features\Appointments\**" />
+    <Compile Remove="Features\Reports\**" />
     <Content Remove="Common\DTOs\**" />
     <Content Remove="Common\Mappings\**" />
     <Content Remove="Features\Appointments\**" />
+    <Content Remove="Features\Reports\**" />
     <EmbeddedResource Remove="Common\DTOs\**" />
     <EmbeddedResource Remove="Common\Mappings\**" />
     <EmbeddedResource Remove="Features\Appointments\**" />
+    <EmbeddedResource Remove="Features\Reports\**" />
     <None Remove="Common\DTOs\**" />
     <None Remove="Common\Mappings\**" />
     <None Remove="Features\Appointments\**" />
+    <None Remove="Features\Reports\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -34,10 +38,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MediClaim.Domain\MediClaim.Domain.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Features\Reports\" />
   </ItemGroup>
 
 </Project>

@@ -71,6 +71,18 @@ public class ExceptionHandlingMiddleware
                         .ToList();
 
                 break;
+            case ForbiddenAccessException ForbiddenAccessException:
+
+                response.StatusCode = (int)HttpStatusCode.Forbidden;
+                problemDetails.Title = "Forbidden Access";
+                problemDetails.Status = response.StatusCode;
+                break;
+            case UnAuthorizedException UnAuthorizedException:
+
+                response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                problemDetails.Title = "UnAuthorized Access";
+                problemDetails.Status = response.StatusCode;
+                break;
 
             case ConflictException conflictException:
 

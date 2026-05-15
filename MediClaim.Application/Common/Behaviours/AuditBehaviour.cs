@@ -7,30 +7,14 @@ using Microsoft.AspNetCore.Http;
 namespace MediClaim.Application
     .Common.Behaviours;
 
-public class AuditBehaviour<
-    TRequest,
-    TResponse>
-    : IPipelineBehavior<
-        TRequest,
-        TResponse>
-
+public class AuditBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : notnull
 {
-    private readonly IApplicationDbContext
-        _context;
-
-    private readonly IUserRepository
-        _currentUserService;
-
-    private readonly ICurrentTenantService
-        _currentTenantService;
-
-    private readonly IHttpContextAccessor
-        _httpContextAccessor;
-
-    private readonly IUnitOfWork
-        _unitOfWork;
-
+    private readonly IApplicationDbContext _context;
+    private readonly IUserRepository _currentUserService;
+    private readonly ICurrentTenantService _currentTenantService;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IUnitOfWork _unitOfWork;
     public AuditBehaviour(
         IApplicationDbContext context,
         IUserRepository currentUserService,
@@ -39,32 +23,20 @@ public class AuditBehaviour<
         IUnitOfWork unitOfWork)
     {
         _context = context;
-
-        _currentUserService =
-            currentUserService;
-
-        _currentTenantService =
-            currentTenantService;
-
-        _httpContextAccessor =
-            httpContextAccessor;
-
-        _unitOfWork =
-            unitOfWork;
+        _currentUserService = currentUserService;
+        _currentTenantService = currentTenantService;
+        _httpContextAccessor = httpContextAccessor;
+        _unitOfWork = unitOfWork;
     }
 
-    public async Task<TResponse>
-        Handle(
+    public async Task<TResponse> Handle(
             TRequest request,
             RequestHandlerDelegate<TResponse> next,
             CancellationToken cancellationToken)
-    {
-        var response =
-            await next();
 
-        if (request is
-            IAuditableCommand
-                auditableRequest)
+    {
+        var response = await next();
+        if (request is IAuditableCommand auditableRequest)
         {
             var httpContext =
                 _httpContextAccessor

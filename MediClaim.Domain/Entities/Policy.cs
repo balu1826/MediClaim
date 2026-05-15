@@ -73,4 +73,5 @@ public class Policy
     {
         get; set;
     }
+    public bool IsArchived { get; set; }
 }

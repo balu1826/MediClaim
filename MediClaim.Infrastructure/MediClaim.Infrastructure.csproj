@@ -10,12 +10,15 @@
     <Compile Remove="Caching\**" />
     <Compile Remove="Email\**" />
     <Compile Remove="Identity\**" />
+    <Compile Remove="Storage\**" />
     <EmbeddedResource Remove="Caching\**" />
     <EmbeddedResource Remove="Email\**" />
     <EmbeddedResource Remove="Identity\**" />
+    <EmbeddedResource Remove="Storage\**" />
     <None Remove="Caching\**" />
     <None Remove="Email\**" />
     <None Remove="Identity\**" />
+    <None Remove="Storage\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -46,7 +49,6 @@
 
   <ItemGroup>
     <Folder Include="Persistence\Migrations\" />
-    <Folder Include="Storage\" />
   </ItemGroup>
 
 </Project>
