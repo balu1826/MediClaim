@@ -23,8 +23,7 @@ namespace MediClaim.Infrastructure;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection
-        AddInfrastructure(
+    public static IServiceCollection AddInfrastructure(
             this IServiceCollection services,
             IConfiguration configuration)
     {
@@ -33,52 +32,32 @@ public static class DependencyInjection
     configuration
         .GetSection("Jwt")
         .Get<JwtSettings>();
-
         services
-            .AddAuthentication(
-                JwtBearerDefaults.AuthenticationScheme)
+            .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
                 options.TokenValidationParameters =
                     new TokenValidationParameters
                     {
                         ValidateIssuer = true,
-
                         ValidateAudience = true,
-
                         ValidateLifetime = true,
-
                         ValidateIssuerSigningKey = true,
-
-                        ValidIssuer =
-                            jwtSettings!.Issuer,
-
-                        ValidAudience =
-                            jwtSettings.Audience,
-
-                        IssuerSigningKey =
-                            new SymmetricSecurityKey(
+                        ValidIssuer =jwtSettings!.Issuer,
+                        ValidAudience = jwtSettings.Audience,
+                        IssuerSigningKey = new SymmetricSecurityKey(
                                 Encoding.UTF8.GetBytes(
                                     jwtSettings.Key))
                     };
             });
-        services.AddScoped<
-    IApplicationDbContext>(
-        provider =>
-            provider.GetRequiredService
-                <ApplicationDbContext>());
-        services.AddAuthorization();
-        services.AddScoped<
-            ICurrentTenantService,
-            CurrentTenantService>();
+        services.AddScoped<IApplicationDbContext>(
+        provider =>provider.GetRequiredService<ApplicationDbContext>());
 
-        services.AddScoped<
-            AuditableEntityInterceptor>();
-        services.Configure<JwtSettings>(
-            configuration.GetSection("Jwt"));
-        services.AddScoped<
-            IJwtTokenGenerator,
-            JwtTokenGenerator>();
+        services.AddAuthorization();
+        services.AddScoped<ICurrentTenantService,CurrentTenantService>();
+        services.AddScoped<AuditableEntityInterceptor>();
+        services.Configure<JwtSettings>(configuration.GetSection("Jwt"));
+        services.AddScoped<IJwtTokenGenerator,JwtTokenGenerator>();
 
         services.AddDbContext<ApplicationDbContext>(
             (sp, options) =>
@@ -108,28 +87,12 @@ public static class DependencyInjection
         services.AddScoped<IPolicyUpgradeService,PolicyUpgradeService>();
         services.AddScoped<IRefreshTokenService,RefreshTokenService>();
         services.AddScoped<IAuthenticationService, AuthenticationService>();
-        services.AddScoped<
-    IFraudRuleEvaluator,
-    FrequentClaimRuleEvaluator>();
-        services.AddScoped<
-            IFraudRuleEvaluator,
-            ExcessiveAmountRuleEvaluator>();
-
-        services.AddScoped<
-            IFraudRuleEvaluator,
-            WeekendTreatmentRuleEvaluator>();
-
-        services.AddScoped<
-            IFraudRuleEvaluator,
-            PriorRejectionRuleEvaluator>();
-
-        services.AddScoped<
-            IFraudRuleEvaluator,
-            ProviderRejectionRateRuleEvaluator>();
-
-        services.AddScoped<
-            IFraudRuleEvaluator,
-            EarlySubmissionRuleEvaluator>();
+        services.AddScoped<IFraudRuleEvaluator, FrequentClaimRuleEvaluator>();
+        services.AddScoped<IFraudRuleEvaluator,ExcessiveAmountRuleEvaluator>();
+        services.AddScoped<IFraudRuleEvaluator,WeekendTreatmentRuleEvaluator>();
+        services.AddScoped<IFraudRuleEvaluator,PriorRejectionRuleEvaluator>();
+        services.AddScoped<IFraudRuleEvaluator,ProviderRejectionRateRuleEvaluator>();
+        services.AddScoped<IFraudRuleEvaluator,EarlySubmissionRuleEvaluator>();
         return services;
     }
 }
