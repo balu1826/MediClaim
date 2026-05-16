@@ -3,6 +3,7 @@ using MediClaim.Application
     .Common.Exceptions;
 using MediClaim.Application
     .Common.Interfaces;
+using MediClaim.Application.Repositories;
 using MediClaim.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,33 +14,24 @@ public class SettleClaimCommandHandler
     : IRequestHandler<
         SettleClaimCommand>
 {
-    private readonly IApplicationDbContext
-        _context;
-
-    private readonly IUserRepository
-        _currentUserService;
-
-    private readonly IClaimSettlementService
-        _settlementService;
-
-    private readonly IUnitOfWork
-        _unitOfWork;
+    private readonly IApplicationDbContext _context;
+    private readonly IUserRepository _currentUserService;
+    private readonly IClaimSettlementService _settlementService;
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IClaimRepository _claimRepository;
 
     public SettleClaimCommandHandler(
         IApplicationDbContext context,
         IUserRepository currentUserService,
         IClaimSettlementService settlementService,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        IClaimRepository claimRepository)
     {
         _context = context;
-
-        _currentUserService =
-            currentUserService;
-
-        _settlementService =
-            settlementService;
-
+        _currentUserService = currentUserService;
+        _settlementService = settlementService;
         _unitOfWork = unitOfWork;
+        _claimRepository = claimRepository;
     }
 
     public async Task Handle(
@@ -51,16 +43,10 @@ public class SettleClaimCommandHandler
                 .TenantId;
 
         var claim =
-            await _context.Claims
-                .Include(x =>
-                    x.Policy)
-                .FirstOrDefaultAsync(
-                    x =>
-                        x.ClaimId ==
-                            request.ClaimId
-                        && x.TenantId ==
-                            tenantId,
-                    cancellationToken);
+            await _claimRepository.GetClaimByIdAsync(
+                request.ClaimId,
+                tenantId,
+                cancellationToken);
 
         if (claim is null)
         {
@@ -84,11 +70,9 @@ public class SettleClaimCommandHandler
             throw new BadRequestException(
                 "Only approved claims can be settled");
         }
-
         var approvedAmount =
             claim.ApprovedAmount
             ?? claim.Amount;
-
         var result =
             await _settlementService
                 .SettleAsync(
@@ -96,18 +80,13 @@ public class SettleClaimCommandHandler
                     approvedAmount,
                     claim.PolicyId,
                     cancellationToken);
-
         if (result.InsufficientBalance)
         {
             throw new ConflictException(
                 "Policy balance insufficient");
         }
-
         // Sync aggregate state
-
-        claim.Status =
-            ClaimStatus.Settled;
-
+        claim.Status = ClaimStatus.Settled;
         await _unitOfWork
             .SaveChangesAsync(
                 cancellationToken);

@@ -3,8 +3,10 @@ using MediClaim.Application
     .Common.Exceptions;
 using MediClaim.Application
     .Common.Interfaces;
+using MediClaim.Application.Repositories;
 using MediClaim.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
+
 
 namespace MediClaim.Application
     .Features.Claims.SubmitClaim;
@@ -25,18 +27,23 @@ public class SubmitClaimCommandHandler
     _fraudScoringService;
     private readonly IClaimAssignmentService
     _claimAssignmentService;
+    private readonly IClaimRepository
+        _claimRepository;
 
     public SubmitClaimCommandHandler(
         IApplicationDbContext context,
         IUserRepository currentUserService,
         IUnitOfWork unitOfWork,
-        IFraudScoringService fraudScoringService,IClaimAssignmentService claimAssignmentService)
+        IFraudScoringService fraudScoringService,
+        IClaimAssignmentService claimAssignmentService,
+        IClaimRepository claimRepository)
     {
         _context = context;
         _currentUserService = currentUserService;
         _fraudScoringService = fraudScoringService;
         _unitOfWork = unitOfWork;
         _claimAssignmentService = claimAssignmentService;
+        _claimRepository = claimRepository;
     }
 
     public async Task Handle(
@@ -45,18 +52,10 @@ public class SubmitClaimCommandHandler
     {
         var userId = _currentUserService.UserId;
         var tenantId = _currentUserService.TenantId;
-        var claim =
-            await _context.Claims
-                .FirstOrDefaultAsync(
-                    x =>
-                        x.ClaimId ==
-                            request.ClaimId
-                        && x.UserId ==
-                            userId
-                        && x.TenantId ==
-                            tenantId,
-                    cancellationToken);
-
+        var claim =await _claimRepository.GetClaimByIdAsync(
+                request.ClaimId,
+                tenantId,
+                cancellationToken);
         if (claim is null)
         {
             throw new NotFoundException(

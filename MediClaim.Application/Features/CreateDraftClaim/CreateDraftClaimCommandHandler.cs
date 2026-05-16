@@ -3,6 +3,7 @@ using MediClaim.Application
     .Common.Exceptions;
 using MediClaim.Application
     .Common.Interfaces;
+using MediClaim.Application.Repositories;
 using MediClaim.Domain.Entities;
 using MediClaim.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -15,26 +16,20 @@ public class CreateDraftClaimCommandHandler
         CreateDraftClaimCommand,
         Guid>
 {
-    private readonly IApplicationDbContext
-        _context;
-
-    private readonly IUserRepository
-        _currentUserService;
-
-    private readonly IUnitOfWork
-        _unitOfWork;
-
+    private readonly IApplicationDbContext _context;
+    private readonly IUserRepository _currentUserService;
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IPolicyRepository _policyRepository;
     public CreateDraftClaimCommandHandler(
         IApplicationDbContext context,
         IUserRepository currentUserService,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        IPolicyRepository policyRepository)
     {
         _context = context;
-
-        _currentUserService =
-            currentUserService;
-
+        _currentUserService = currentUserService;
         _unitOfWork = unitOfWork;
+        _policyRepository = policyRepository;
     }
 
     public async Task<Guid> Handle(
@@ -50,39 +45,17 @@ public class CreateDraftClaimCommandHandler
                 .TenantId;
 
         // Validate active policy ownership
-
-        var policy =
-            await _context.Policies
-                .Include(x =>
-                    x.PolicyType)
-                .ThenInclude(x =>
-                    x.CoverageCategories)
-                .FirstOrDefaultAsync(
-                    x =>
-                        x.PolicyId ==
-                            request.PolicyId
-                        && x.PatientId ==
-                            userId
-                        && x.TenantId ==
-                            tenantId
-                        && x.StartDate <=
-                            DateOnly
-                                .FromDateTime(
-                                    DateTime.UtcNow)
-                        && x.EndDate >=
-                            DateOnly
-                                .FromDateTime(
-                                    DateTime.UtcNow),
-                    cancellationToken);
-
-        if (policy is null)
+        var policy =await _policyRepository.GetPolicyByIdAsync(
+            request.PolicyId,
+            cancellationToken);
+        if (policy is null||policy.StartDate > DateOnly.FromDateTime(DateTime.UtcNow)||
+            policy.EndDate < DateOnly.FromDateTime(DateTime.UtcNow))
         {
             throw new BadRequestException(
                 "Active policy not found");
         }
 
         // Validate coverage category
-
         var categoryCovered =
             policy.PolicyType
                 .CoverageCategories
@@ -102,33 +75,15 @@ public class CreateDraftClaimCommandHandler
         var claim =
             new Claim
             {
-                ClaimId =
-                    Guid.NewGuid(),
-
-                TenantId =
-                    tenantId,
-
-                UserId =
-                    userId,
-
-                PolicyId =
-                    request.PolicyId,
-
-                Amount =
-                    request.Amount,
-
-                DiagnosisCode =
-                    request.DiagnosisCode,
-
-                TreatmentCategory =
-                    request
-                        .TreatmentCategory,
-
-                Description =
-                    request.Description,
-
-                Status =
-                    ClaimStatus.Draft
+                ClaimId = Guid.NewGuid(),
+                TenantId = tenantId,
+                UserId = userId,
+                PolicyId = request.PolicyId,
+                Amount = request.Amount,
+                DiagnosisCode = request.DiagnosisCode,
+                TreatmentCategory = request.TreatmentCategory,
+                Description = request.Description,
+                Status = ClaimStatus.Draft
             };
 
         await _context.Claims

@@ -1,11 +1,15 @@
 ﻿using BCrypt.Net;
 using MediatR;
 using MediClaim.Application.Common.Exceptions;
-using MediClaim.Application.Common.Interfaces;
+using MediClaim.Application.Repositories;
 using MediClaim.Domain.Common;
 using MediClaim.Domain.Entities;
+using MediClaim.Application.Common.Interfaces;
 using MediClaim.Domain.Enums;
 using System.Text.Json;
+
+
+
 
 namespace MediClaim.Application
     .Features.Auth.Commands.RegisterTenant;
@@ -33,9 +37,7 @@ public class RegisterTenantCommandHandler
         IEncryptionService encryptionService)
     {
         _tenantRepository = tenantRepository;
-
         _userRepository = userRepository;
-
         _unitOfWork = unitOfWork;
         _encryptionService = encryptionService;
     }
@@ -73,11 +75,8 @@ public class RegisterTenantCommandHandler
         var tenant = new Tenant
         {
             TenantId = Guid.NewGuid(),
-
             Name = request.TenantName,
-
             Slug = request.Slug,
-
             Status = TenantStatus.Active,
             SettingsJson =
             JsonSerializer.Serialize(
@@ -90,11 +89,8 @@ public class RegisterTenantCommandHandler
         var adminUser = new User
         {
             UserId = Guid.NewGuid(),
-
             TenantId = tenant.TenantId,
-
             Email = request.AdminEmail,
-
             PasswordHash = BCrypt.Net.BCrypt
                 .HashPassword(request.Password),
             SsnEncrypted =
@@ -106,10 +102,8 @@ public class RegisterTenantCommandHandler
 
         await _userRepository
             .AddAsync(adminUser);
-
         await _unitOfWork
             .SaveChangesAsync(cancellationToken);
-
         return tenant.TenantId;
     }
 }

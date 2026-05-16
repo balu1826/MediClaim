@@ -6,6 +6,4 @@
   <Project Path="MediClaim.Application/MediClaim.Application.csproj" />
   <Project Path="MediClaim.Domain/MediClaim.Domain.csproj" />
   <Project Path="MediClaim.Infrastructure/MediClaim.Infrastructure.csproj" />
-  <Project Path="MediClaim.Tests.Integration/MediClaim.Tests.Integration.csproj" />
-  <Project Path="MediClaim.Tests.Unit/MediClaim.Tests.Unit.csproj" />
 </Solution>

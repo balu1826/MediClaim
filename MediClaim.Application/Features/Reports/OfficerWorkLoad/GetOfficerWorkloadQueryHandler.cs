@@ -18,14 +18,12 @@ public class GetOfficerWorkloadQueryHandler
         _repository = repository;
     }
 
-    public async Task<
-        List<OfficerWorkloadDto>>
-            Handle(
+    public async Task<List<OfficerWorkloadDto>> Handle(
                 GetOfficerWorkloadQuery request,
                 CancellationToken cancellationToken)
     {
         return await _repository
-            .GetOfficerWorkloadAsync(
-                cancellationToken);
+            .GetOfficerWorkloadAsync(cancellationToken);
+
     }
 }

@@ -5,6 +5,7 @@ using MediClaim.Application
     .Features.Claims.Common;
 using MediClaim.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
+using MediClaim.Application.Repositories;
 
 namespace MediClaim.Application
     .Features.Claims.GetOfficerQueue;
@@ -14,75 +15,26 @@ public class GetOfficerQueueQueryHandler
         GetOfficerQueueQuery,
         List<OfficerClaimQueueDto>>
 {
-    private readonly IApplicationDbContext
-        _context;
-
-    private readonly IUserRepository
-        _currentUserService;
-
+    private readonly IApplicationDbContext _context;
+    private readonly IUserRepository _currentUserService;
+    private readonly IClaimRepository _claimRepository;
     public GetOfficerQueueQueryHandler(
         IApplicationDbContext context,
-        IUserRepository currentUserService)
+        IUserRepository currentUserService,
+        IClaimRepository claimRepository)
     {
         _context = context;
-
-        _currentUserService =
-            currentUserService;
+        _currentUserService = currentUserService;
+        _claimRepository = claimRepository; 
     }
 
-    public async Task<
-        List<OfficerClaimQueueDto>>
-            Handle(
+    public async Task<List<OfficerClaimQueueDto>> Handle(
                 GetOfficerQueueQuery request,
                 CancellationToken cancellationToken)
     {
-        var tenantId =
-            _currentUserService
-                .TenantId;
-
-        return await _context.Claims
-            .Where(x =>
-                x.TenantId == tenantId
-                && x.Status ==
-                    ClaimStatus.Submitted)
-            .OrderByDescending(x =>
-                x.RequiresFraudReview)
-            .ThenByDescending(x =>
-                x.FraudRiskScore)
-            .ThenBy(x =>
-                x.CreatedAt)
-            .Select(x =>
-                new OfficerClaimQueueDto
-                {
-                    ClaimId =
-                        x.ClaimId,
-
-                    PolicyNumber =
-                        x.Policy
-                            .PolicyNumber,
-
-                    Amount =
-                        x.Amount,
-
-                    DiagnosisCode =
-                        x.DiagnosisCode,
-
-                    TreatmentCategory =
-                        x.TreatmentCategory,
-
-                    Status =
-                        x.Status,
-
-                    FraudRiskScore =
-                        x.FraudRiskScore,
-
-                    RequiresFraudReview =
-                        x.RequiresFraudReview,
-
-                    SubmittedAt =
-                        x.UpdatedAt
-                })
-            .ToListAsync(
-                cancellationToken);
+        var tenantId = _currentUserService.TenantId;
+        var userId = _currentUserService.UserId;
+        return await _claimRepository.GetOfficerQueueAsync
+            (tenantId, userId, cancellationToken);
     }
 }

@@ -15,7 +15,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
+using System.Text; 
 using MediClaim.Application.Repositories;
 
 
@@ -96,8 +96,10 @@ public static class DependencyInjection
         services.AddScoped(typeof(IRepository<>),typeof(Repository<>));
         services.AddScoped<IUnitOfWork,UnitOfWork>();
         services.AddScoped<IReportRepository, ReportRepository>();
+        services.AddScoped<IClaimRepository, ClaimRepository>();
         services.AddScoped<IUserRepository,UserRepository>();
         services.AddScoped<ITenantRepository,TenantRepository>();
+        services.AddScoped<IPolicyRepository, PolicyRepository>();
         services.AddScoped<IEncryptionService,EncryptionService>();
         services.AddScoped<IFraudScoringService,FraudScoringService>();
         services.AddScoped<IFraudScoringService,FraudScoringService>();

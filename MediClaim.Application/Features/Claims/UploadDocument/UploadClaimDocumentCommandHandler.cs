@@ -3,6 +3,8 @@ using MediClaim.Application.Common.Interfaces;
 using MediClaim.Domain.Entities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using MediClaim.Application.Repositories;
+using MediClaim.Application.Common.Exceptions;
 
 namespace MediClaim.Application.Features.Claims.UploadDocument;
 
@@ -12,25 +14,36 @@ public class UploadClaimDocumentCommandHandler
     private readonly IApplicationDbContext _context;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IWebHostEnvironment _environment;
+    private readonly IClaimRepository _claimRepository;
+    private readonly IUserRepository _currentUserService;
     public UploadClaimDocumentCommandHandler(
         IApplicationDbContext context,
         IUnitOfWork unitOfWork,
-        IWebHostEnvironment environment)
+        IWebHostEnvironment environment,
+        IClaimRepository claimRepository,
+        IUserRepository currentUserService)
     {
         _context = context;
         _unitOfWork = unitOfWork;
         _environment = environment;
+        _claimRepository = claimRepository;
+        _currentUserService = currentUserService;
     }
 
     public async Task Handle(
         UploadClaimDocumentCommand request,
         CancellationToken cancellationToken)
     {
+        var userId =  _currentUserService.UserId;
+          
         var claim =
-            await _context.Claims
-                .SingleAsync(
-                    x => x.ClaimId == request.ClaimId,
-                    cancellationToken);
+            await _claimRepository.GetClaimByIdAsync(
+                userId,
+                request.ClaimId,
+                cancellationToken);
+        if(claim  == null) {
+            throw new NotFoundException("Claim not found");
+        }
 
         var uploadsFolder =
             Path.Combine(
