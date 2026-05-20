@@ -91,8 +91,7 @@ public class PolicyUpgradeService
                     x => x.Amount,
                     cancellationToken);
 
-        if (newRemaining
-            < pendingExposure)
+        if (newRemaining < pendingExposure)
         {
             throw new ConflictException(
                 "Upgrade would reduce remaining coverage below pending liabilities");

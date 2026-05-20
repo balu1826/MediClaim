@@ -42,18 +42,13 @@ public class AuthorizationBehaviour<
     {
         // Apply only to claim-scoped requests
 
-        if (request is
-            IClaimScopedRequest
-                claimRequest)
+        if (request is IClaimScopedRequest claimRequest)
         {
             var claim =
                 await _context.Claims
                     .AsNoTracking()
                     .FirstOrDefaultAsync(
-                        x =>
-                            x.ClaimId ==
-                                claimRequest
-                                    .ClaimId,
+                        x => x.ClaimId == claimRequest.ClaimId,
                         cancellationToken);
 
             if (claim is null)
@@ -64,13 +59,8 @@ public class AuthorizationBehaviour<
 
             // Patients can only access their own claims
 
-            if (_currentUserService
-                    .Role ==
-                        UserRole.Patient.ToString()
-                &&
-                claim.UserId !=
-                    _currentUserService
-                        .UserId)
+            if (_currentUserService.Role == UserRole.Patient.ToString()
+                && claim.UserId != _currentUserService.UserId)
             {
                 throw new ForbiddenAccessException(
                     "Access denied");

@@ -35,7 +35,6 @@ public class RateLimitingMiddleware
                 .ToLower();
 
         // Apply ONLY to auth endpoints
-
         if (path is null
             ||
             !path.StartsWith(
@@ -45,19 +44,12 @@ public class RateLimitingMiddleware
 
             return;
         }
-
-        var ip =
-            context.Connection
+        var ip = context.Connection
                 .RemoteIpAddress
                 ?.ToString()
             ?? "unknown";
-
-        var key =
-            $"{ip}:{path}";
-
-        var now =
-            DateTime.UtcNow;
-
+        var key = $"{ip}:{path}";
+        var now = DateTime.UtcNow;
         var requests =
             _cache.GetOrCreate(
                 key,
@@ -73,32 +65,21 @@ public class RateLimitingMiddleware
         {
             // Remove expired timestamps
 
-            requests.RemoveAll(
-                x =>
-                    now - x > Window);
-
+            requests.RemoveAll(x => now - x > Window);
             // Limit exceeded
-
             if (requests.Count >= Limit)
             {
-                context.Response.StatusCode =
-                    StatusCodes
-                        .Status429TooManyRequests;
-
-                context.Response.Headers[
-                    "Retry-After"] =
-                        "60";
-
+                context.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+                context.Response.Headers["Retry-After"] = "60";
                 context.Response
                              .WriteAsJsonAsync(
                                  new
                                  {
-                                     Error =
-                                         "Rate limit exceeded"
+                                     Error = "Rate limit exceeded"
+
                                  });
                 return;
             }
-
             requests.Add(now);
         }
 

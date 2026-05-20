@@ -96,16 +96,10 @@ public class WeeklyClaimsSummaryJob
                 decimal averageProcessingHours = 0;
                 if (processedClaims.Any())
                 {
-                    averageProcessingHours =
-                        (decimal)
-                            processedClaims
-                                .Average(x =>
-                                    (
-                                        x.UpdatedAt!
-                                        - x.SubmittedAt)
-                                    .TotalHours);
+                    averageProcessingHours = (decimal)processedClaims
+                                .Average(x => (x.UpdatedAt! - x.SubmittedAt)
+                                .TotalHours);
                 }
-
                 var reportContent =
                     $"""
                     Weekly Claims Summary
@@ -132,32 +126,16 @@ public class WeeklyClaimsSummaryJob
                 var report =
                     new Report
                     {
-                        ReportId =
-                            Guid.NewGuid(),
+                        ReportId = Guid.NewGuid(),
+                        TenantId = tenant.TenantId,
+                        ReportType = "Weekly",
+                        TotalClaims = totalClaims,
+                        ApprovedClaims = approvedClaims,
+                        RejectionRate = rejectionRate,
+                        AverageProcessingTimeHours = averageProcessingHours,
+                        ReportContent = reportContent,
+                        GeneratedAt = DateTime.UtcNow
 
-                        TenantId =
-                            tenant.TenantId,
-
-                        ReportType =
-                            "Weekly",
-
-                        TotalClaims =
-                            totalClaims,
-
-                        ApprovedClaims =
-                            approvedClaims,
-
-                        RejectionRate =
-                            rejectionRate,
-
-                        AverageProcessingTimeHours =
-                            averageProcessingHours,
-
-                        ReportContent =
-                            reportContent,
-
-                        GeneratedAt =
-                            DateTime.UtcNow
                     };
 
                 await _context

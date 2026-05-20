@@ -31,11 +31,9 @@ public class ProviderRejectionRateRuleEvaluator : IFraudRuleEvaluator
         var claims =
             await _context.Claims
                 .Where(x =>
-                    x.ProviderId ==
-                        claim.ProviderId
-                    && x.TenantId ==
-                        claim.TenantId
-                    && x.CreatedAt >= since)
+                    x.ProviderId == claim.ProviderId
+                    && x.TenantId == claim.TenantId
+                    && x.UpdatedAt >= since)
                 .ToListAsync(cancellationToken);
         if (!claims.Any())
         {
@@ -44,13 +42,10 @@ public class ProviderRejectionRateRuleEvaluator : IFraudRuleEvaluator
 
         var rejected =
             claims.Count(x =>
-                x.Status ==
-                    ClaimStatus.Rejected);
-
+                x.Status == ClaimStatus.Rejected);
         var rate =
             (decimal)rejected /
             claims.Count;
-
         return rate > 0.4m
             ? 10
             : 0;

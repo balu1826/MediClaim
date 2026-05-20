@@ -77,35 +77,22 @@ AND IsOnLeave = 0",
                         ClaimStatus.UnderReview
                      || x.Status ==
                         ClaimStatus.PendingDocuments))
-                .GroupBy(x =>
-                    x.AssignedOfficerId)
+                .GroupBy(x => x.AssignedOfficerId)
                 .Select(x =>
                     new
                     {
-                        OfficerId =
-                            x.Key,
-
-                        Count =
-                            x.Count()
+                        OfficerId = x.Key,
+                        Count = x.Count()
                     })
                 .ToListAsync(
                     cancellationToken);
 
-        var selectedOfficer =
-            eligibleOfficers
-                .OrderBy(x =>
-                    officerWorkloads
-                        .FirstOrDefault(w =>
-                            w.OfficerId ==
-                                x.UserId)
-                        ?.Count ?? 0)
-                .ThenBy(x =>
-                    x.LastAssignedAt
-                    ?? DateTime.MinValue)
-                .First();
+        var selectedOfficer = eligibleOfficers
+                                 .OrderBy(x => officerWorkloads.FirstOrDefault(w => w.OfficerId == x.UserId)?.Count ?? 0)
+                                 .ThenBy(x => x.LastAssignedAt ?? DateTime.MinValue)
+                                 .First();
 
         // Assign
-
         claim.AssignedOfficerId =
             selectedOfficer.UserId;
 

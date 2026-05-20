@@ -23,14 +23,10 @@ public class PriorRejectionRuleEvaluator : IFraudRuleEvaluator
         var exists =
             await _context.Claims
                 .AnyAsync(x =>
-                    x.UserId ==
-                        claim.UserId
-                    && x.DiagnosisCode ==
-                        claim.DiagnosisCode
-                    && x.Status ==
-                        ClaimStatus.Rejected
+                    x.UserId == claim.UserId
+                    && x.DiagnosisCode == claim.DiagnosisCode
+                    && x.Status == ClaimStatus.Rejected
                     && x.CreatedAt >= since);
-
         return exists ? 15 : 0;
     }
 }

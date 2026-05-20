@@ -30,14 +30,12 @@ public class WeekendTreatmentRuleEvaluator
         }
         var provider =
             await _context.Providers
-                .SingleAsync(
-                    x =>
-                        x.ProviderId ==
-                            claim.ProviderId);
+                .SingleAsync(x => x.ProviderId == claim.ProviderId);
         var day = claim.TreatmentDate.DayOfWeek;
         var weekend =
             day == DayOfWeek.Saturday
-            || day == DayOfWeek.Sunday;
+            || 
+            day == DayOfWeek.Sunday;
 
         var nonEmergency =
             provider.Specialty !=

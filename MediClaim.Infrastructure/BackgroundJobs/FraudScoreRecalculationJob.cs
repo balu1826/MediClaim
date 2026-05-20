@@ -50,18 +50,11 @@ public class FraudScoreRecalculationJob
                 var claims =
                     await _context.Claims
                         .Where(
-                            x =>
-                                x.Status ==
-                                    ClaimStatus.Draft
-                                ||
-                                x.Status ==
-                                    ClaimStatus.PendingDocuments)
-                        .OrderBy(
-                            x => x.CreatedAt)
+                            x => x.Status == ClaimStatus.Draft || x.Status == ClaimStatus.PendingDocuments)
+                        .OrderBy(x => x.CreatedAt)
                         .Skip(page * batchSize)
                         .Take(batchSize)
-                        .ToListAsync(
-                            cancellationToken);
+                        .ToListAsync(cancellationToken);
                 if (!claims.Any())
                 {
                     break;

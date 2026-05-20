@@ -20,21 +20,12 @@ public class RequestTimingMiddleware
         HttpContext context,
         ICurrentTenantService currentTenantService)
     {
-        var stopwatch =
-            Stopwatch.StartNew();
-
+        var stopwatch = Stopwatch.StartNew();
         context.Response.OnStarting(() =>
         {
             stopwatch.Stop();
-
-            var elapsedMs =
-                stopwatch
-                    .ElapsedMilliseconds;
-
-            context.Response.Headers[
-                "X-Response-Time-Ms"] =
-                    elapsedMs.ToString();
-
+            var elapsedMs = stopwatch.ElapsedMilliseconds;
+            context.Response.Headers["X-Response-Time-Ms"] = elapsedMs.ToString();
             if (elapsedMs > 1000)
             {
                 Log.Warning(
@@ -50,10 +41,8 @@ public class RequestTimingMiddleware
                     currentTenantService.TenantId,
                     elapsedMs);
             }
-
             return Task.CompletedTask;
         });
-
         await _next(context);
     }
 }

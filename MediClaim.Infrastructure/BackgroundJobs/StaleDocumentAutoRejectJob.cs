@@ -41,26 +41,17 @@ public class StaleDocumentAutoRejectJob
         var executionLog =
             new JobExecutionLog
             {
-                JobName =
-                    nameof(
-                        StaleDocumentAutoRejectJob),
-
-                StartedAt =
-                    DateTime.UtcNow,
-
-                Status =
-                    "Running"
+                JobName = nameof(StaleDocumentAutoRejectJob),
+                StartedAt = DateTime.UtcNow,
+                Status = "Running"
             };
 
         await _context.JobExecutionLogs
-            .AddAsync(
-                executionLog,
+            .AddAsync(executionLog,
                 cancellationToken);
-
         await _unitOfWork
             .SaveChangesAsync(
                 cancellationToken);
-
         try
         {
             var cutoffDate =
@@ -70,59 +61,30 @@ public class StaleDocumentAutoRejectJob
             var staleClaims =
                 await _context.Claims
                     .Where(
-                        x =>
-                            x.Status ==
-                                ClaimStatus
-                                    .PendingDocuments
+                        x => x.Status == ClaimStatus.PendingDocuments
                             &&
-                            x.UpdatedAt <
-                                cutoffDate)
+                            x.UpdatedAt < cutoffDate)
                     .ToListAsync(
                         cancellationToken);
 
-            foreach (var claim
-                in staleClaims)
+            foreach (var claim in staleClaims)
             {
-                // IDEMPOTENCY CHECK
-
-                if (claim.Status !=
-                    ClaimStatus
-                        .PendingDocuments)
-                {
-                    continue;
-                }
-
-                claim.Status =
-                    ClaimStatus
-                        .Rejected;
-
-                claim.RejectionReason =
-                    "STALE_DOCUMENTS";
-
-                claim.UpdatedAt =
-                    DateTime.UtcNow;
-
+         
+                claim.Status = ClaimStatus.Rejected;
+                claim.RejectionReason = "STALE_DOCUMENTS";
+                claim.UpdatedAt = DateTime.UtcNow;
                 await _context
                     .ClaimStatusHistories
                     .AddAsync(
                         new ClaimStatusHistory
                         {
-                            ClaimStatusHistoryId =
-                                Guid.NewGuid(),
-
-                            ClaimId =
-                                claim.ClaimId,
-
-                            Status =
-                                ClaimStatus
+                            ClaimStatusHistoryId = Guid.NewGuid(),
+                            ClaimId = claim.ClaimId,
+                            Status = ClaimStatus
                                     .Rejected
                                     .ToString(),
-
-                            ChangedAt =
-                                DateTime.UtcNow,
-
-                            Notes =
-                                "Auto-rejected due to stale documents"
+                            ChangedAt = DateTime.UtcNow,
+                            Notes = "Auto-rejected due to stale documents"
                         },
                         cancellationToken);
 

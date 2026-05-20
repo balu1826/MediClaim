@@ -1,0 +1,32 @@
+openapi: 3.0.3
+
+info:
+  title: MediClaim API
+  version: 1.0.0
+
+paths:
+
+  /v1/claims/submit:
+
+    post:
+
+      tags:
+        - Claims
+
+      summary: Submit draft claim
+
+      description: Submits a draft claim and returns claim id
+
+      operationId: SubmitClaim
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmitClaimRequest'
+
+      responses:
+
+        '201':
+          description: Claim submitted successfully

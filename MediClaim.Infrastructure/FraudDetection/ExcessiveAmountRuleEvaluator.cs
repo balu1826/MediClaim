@@ -1,4 +1,5 @@
-﻿using MediClaim.Application
+﻿using MediClaim.Application.Common.Exceptions;
+using MediClaim.Application
     .Common.Interfaces;
 using MediClaim.Domain.Entities;
 using MediClaim.Domain.Enums;
@@ -24,15 +25,11 @@ public class ExcessiveAmountRuleEvaluator: IFraudRuleEvaluator
         var approvedAmounts =
             await _context.Claims
                 .Where(x =>
-                    x.TenantId ==
-                        claim.TenantId
-                    && x.DiagnosisCode ==
-                        claim.DiagnosisCode
-                    && x.Status ==
-                        ClaimStatus.Approved
+                    x.TenantId == claim.TenantId
+                    && x.DiagnosisCode == claim.DiagnosisCode
+                    && x.Status == ClaimStatus.Approved
                     && x.ApprovedAmount != null)
-                .Select(x =>
-                    x.ApprovedAmount!.Value)
+                .Select(x => x.ApprovedAmount!.Value)
                 .OrderBy(x => x)
                 .ToListAsync(cancellationToken);
         if (!approvedAmounts.Any())
@@ -40,7 +37,6 @@ public class ExcessiveAmountRuleEvaluator: IFraudRuleEvaluator
             return 0;
         }
         var count = approvedAmounts.Count;
-
         decimal median;
         if (count % 2 == 0)
         {

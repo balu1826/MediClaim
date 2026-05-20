@@ -24,20 +24,18 @@ public class FrequentClaimRuleEvaluator : IFraudRuleEvaluator
             DateTime.UtcNow
                 .AddDays(-30);
 
-        var claims =
-            await _context.Claims
-                .Where(x =>
-                    x.UserId ==
-                        claim.UserId
-                    && x.DiagnosisCode ==
-                        claim.DiagnosisCode
-                    && x.CreatedAt >= since
-                    && x.ProviderId !=
-                        claim.ProviderId)
-                .Select(x =>
-                    x.ProviderId)
-                .Distinct()
-                .CountAsync();
-        return claims > 3 ? 25 : 0; 
+        var claims = await _context.Claims
+            .Where(x =>
+                 x.UserId == claim.UserId &&
+                 x.DiagnosisCode == claim.DiagnosisCode &&
+                 x.CreatedAt >= since)
+            .ToListAsync();
+        var distinctProviders = claims
+            .Select(x => x.ProviderId)
+            .Distinct()
+            .Count();
+        return claims.Count > 3 && distinctProviders > 1
+            ? 25
+            : 0;
     }
 }
