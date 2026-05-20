@@ -1,6 +1,12 @@
 <Solution>
+  <Folder Name="/OpenApi/">
+    <File Path="claims-api.yaml" />
+  </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".gitignore" />
+  </Folder>
+  <Folder Name="/spectral/">
+    <File Path=".spectral.yaml" />
   </Folder>
   <Project Path="MediClaim.API/MediClaim.API.csproj" />
   <Project Path="MediClaim.Application/MediClaim.Application.csproj" />

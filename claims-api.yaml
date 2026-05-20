@@ -3,10 +3,23 @@ openapi: 3.0.3
 info:
   title: MediClaim API
   version: 1.0.0
+  description: Enterprise Claims Processing API
+
+  contact:
+    name: MediClaim API Team
+    email: api-support@mediclaim.com
+
+servers:
+  - url: https://localhost:5001
+    description: Local Development
+
+tags:
+  - name: Claims
+    description: Claim workflow operations
 
 paths:
 
-  /v1/claims/submit:
+  /v1/claims/{claimId}/submit:
 
     post:
 
@@ -15,18 +28,138 @@ paths:
 
       summary: Submit draft claim
 
-      description: Submits a draft claim and returns claim id
+      description: Transitions claim from Draft state to Submitted state
 
       operationId: SubmitClaim
 
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SubmitClaimRequest'
+      security:
+        - bearerAuth: []
+
+      parameters:
+
+        - name: claimId
+          in: path
+          required: true
+
+          schema:
+            type: string
+            format: uuid
+
+          description: Claim identifier
+          example: "550e8400-e29b-41d4-a716-446655440000"
+
+        - $ref: '#/components/parameters/CorrelationIdHeader'
+
+        - $ref: '#/components/parameters/IdempotencyKeyHeader'
 
       responses:
 
-        '201':
+        '204':
           description: Claim submitted successfully
+
+        '400':
+          description: Validation failure
+
+          content:
+
+            application/problem+json:
+
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+
+        '401':
+          description: Unauthorized
+
+        '403':
+          description: Forbidden
+
+        '404':
+          description: Claim not found
+
+        '409':
+          description: Claim already submitted
+
+          content:
+
+            application/problem+json:
+
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+
+        '429':
+          description: Too many requests
+
+        '500':
+          description: Internal server error
+
+          content:
+
+            application/problem+json:
+
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+
+components:
+
+  securitySchemes:
+
+    bearerAuth:
+
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+
+    CorrelationIdHeader:
+
+      name: X-Correlation-ID
+      in: header
+      required: true
+
+      schema:
+        type: string
+
+      description: Distributed tracing correlation identifier
+
+      example: "9f3b6b8f-6f4d-4f3c-9d53-8c0d9d6f2f21"
+
+    IdempotencyKeyHeader:
+
+      name: Idempotency-Key
+      in: header
+      required: true
+
+      schema:
+        type: string
+
+      description: Prevents duplicate submissions
+
+      example: "submit-claim-001"
+
+  schemas:
+
+    ProblemDetails:
+
+      type: object
+
+      required:
+        - title
+        - status
+
+      properties:
+
+        type:
+          type: string
+
+        title:
+          type: string
+
+        status:
+          type: integer
+
+        traceId:
+          type: string
+
+        detail:
+          type: string

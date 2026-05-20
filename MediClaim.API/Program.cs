@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
+using System.Reflection;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,13 +31,37 @@ builder.Services.AddControllers();
 
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc(
-        "v1",
-        new OpenApiInfo
+    options.AddServer(new OpenApiServer
+    {
+        Url = "https://localhost:44312",
+        Description = "Local"
+    });
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "MediClaim API",
+        Version = "v1",
+        Description = "Enterprise Claims API",
+
+        Contact = new OpenApiContact
         {
-            Title = "MediClaim API",
-            Version = "v1"
-        });
+            Name = "MediClaim Team",
+            Email = "support@mediclaim.com"
+        }
+    });
+    //options.SwaggerDoc(
+    //    "v1",
+    //    new OpenApiInfo
+    //    {
+    //        Title = "MediClaim API",
+    //        Version = "v1"
+    //    });
+    var xmlFile =
+        $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+
+    var xmlPath =
+        Path.Combine(AppContext.BaseDirectory, xmlFile);
+
+    options.IncludeXmlComments(xmlPath);
 
     options.AddSecurityDefinition(
         "Bearer",

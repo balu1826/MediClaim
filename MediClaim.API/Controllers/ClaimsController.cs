@@ -19,7 +19,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace MediClaim.API.Controllers;
 
 [ApiController]
-[Route("api/claims")]
+[Route("v1/claims")]
 [Authorize]
 public class ClaimsController
     : ControllerBase
@@ -63,14 +63,12 @@ public class ClaimsController
     [HttpPost("{claimId}/submit")]
     [Authorize(Roles = nameof(UserRole.Patient))]
     public async Task<IActionResult> Submit(
-        Guid claimId)
+         Guid claimId,
+        [FromHeader(Name = "Idempotency-Key")]
+        string idempotencyKey)
     {
-        await _mediator.Send(
-            new SubmitClaimCommand
-            {
-                ClaimId = claimId
-            });
-
+        var command = new SubmitClaimCommand { ClaimId = claimId };
+        await _mediator.Send(command);
         return NoContent();
     }
     [HttpGet("officer-queue")]

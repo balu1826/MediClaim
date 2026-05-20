@@ -20,7 +20,7 @@
     <None Remove="Filters\**" />
     <None Remove="Swagger\**" />
   </ItemGroup>
-
+    
   <ItemGroup>
     <PackageReference Include="Hangfire" Version="1.8.23" />
     <PackageReference Include="Hangfire.AspNetCore" Version="1.8.23" />
@@ -37,5 +37,8 @@
     <ProjectReference Include="..\MediClaim.Application\MediClaim.Application.csproj" />
     <ProjectReference Include="..\MediClaim.Infrastructure\MediClaim.Infrastructure.csproj" />
   </ItemGroup>
+	<PropertyGroup>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
 
 </Project>
