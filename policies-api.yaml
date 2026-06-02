@@ -1,0 +1,290 @@
+openapi: 3.0.3
+
+info:
+  title: Policies API
+  version: 1.0.0
+  description: Enterprise Policy Management API for MediClaim Platform
+
+  contact:
+    name: API Support Team
+    email: api-support@mediclaim.com
+
+servers:
+  - url: https://api.mediclaim.com
+
+tags:
+  - name: Policies
+    description: Policy enrollment and upgrade operations
+
+paths:
+
+  /v1/policies/enroll:
+
+    post:
+
+      tags:
+        - Policies
+
+      summary: Enroll policy
+
+      description: |
+        Creates a new policy enrollment for a patient.
+
+      operationId: enrollPolicy
+
+      security:
+        - bearerAuth: []
+
+      requestBody:
+        required: true
+
+        content:
+          application/json:
+
+            schema:
+              $ref: '#/components/schemas/EnrollPolicyCommand'
+
+            examples:
+
+              enrollPolicyRequest:
+                summary: Sample enrollment request
+
+                value:
+                  patientId: "11111111-1111-1111-1111-111111111111"
+                  policyTypeId: "22222222-2222-2222-2222-222222222222"
+                  startDate: "2026-01-01"
+                  endDate: "2026-12-31"
+
+      responses:
+
+        '200':
+          description: Policy enrolled successfully
+
+          content:
+            application/json:
+
+              schema:
+                type: string
+                format: uuid
+
+              examples:
+
+                successResponse:
+                  summary: Created policy identifier
+                  value: "33333333-3333-3333-3333-333333333333"
+
+        '400':
+          description: Validation failed
+
+          content:
+            application/problem+json:
+
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+
+        '401':
+          description: Unauthorized
+
+          content:
+            application/problem+json:
+
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+
+        '403':
+          description: Forbidden
+
+          content:
+            application/problem+json:
+
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+
+        '500':
+          description: Internal server error
+
+          content:
+            application/problem+json:
+
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+
+  /v1/policies/{policyId}/upgrade:
+
+    put:
+
+      tags:
+        - Policies
+
+      summary: Upgrade policy
+
+      description: |
+        Upgrades an existing policy to another policy type.
+
+      operationId: upgradePolicy
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+
+        - name: policyId
+          in: path
+          required: true
+
+          description: Unique identifier of the policy
+
+          schema:
+            type: string
+            format: uuid
+
+      requestBody:
+        required: true
+
+        content:
+          application/json:
+
+            schema:
+              $ref: '#/components/schemas/UpgradePolicyRequest'
+            example: "11111111-1111-1111-1111-111111111111"
+
+            examples:
+
+              upgradePolicyRequest:
+                summary: Sample upgrade request
+
+                value:
+                  newPolicyTypeId: "44444444-4444-4444-4444-444444444444"
+
+      responses:
+
+        '204':
+          description: Policy upgraded successfully
+
+        '400':
+          description: Validation failed
+
+          content:
+            application/problem+json:
+
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+
+        '401':
+          description: Unauthorized
+
+          content:
+            application/problem+json:
+
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+
+        '403':
+          description: Forbidden
+
+          content:
+            application/problem+json:
+
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+
+        '404':
+          description: Policy not found
+
+          content:
+            application/problem+json:
+
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+
+        '500':
+          description: Internal server error
+
+          content:
+            application/problem+json:
+
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+
+components:
+
+  securitySchemes:
+
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+
+    EnrollPolicyCommand:
+
+      type: object
+
+      required:
+        - patientId
+        - policyTypeId
+        - startDate
+        - endDate
+
+      properties:
+
+        patientId:
+          type: string
+          format: uuid
+          description: Unique identifier of the patient
+
+        policyTypeId:
+          type: string
+          format: uuid
+          description: Unique identifier of the policy type
+
+        startDate:
+          type: string
+          format: date
+          description: Policy effective start date
+
+        endDate:
+          type: string
+          format: date
+          description: Policy effective end date
+
+    UpgradePolicyRequest:
+
+      type: object
+
+      required:
+        - newPolicyTypeId
+
+      properties:
+
+        newPolicyTypeId:
+          type: string
+          format: uuid
+          description: New policy type identifier
+
+    ProblemDetails:
+
+      type: object
+
+      properties:
+
+        type:
+          type: string
+          description: URI reference identifying the error type
+
+        title:
+          type: string
+          description: Human-readable error summary
+
+        status:
+          type: integer
+          description: HTTP status code
+
+        detail:
+          type: string
+          description: Detailed error explanation
+
+        traceId:
+          type: string
+          description: Distributed tracing identifier

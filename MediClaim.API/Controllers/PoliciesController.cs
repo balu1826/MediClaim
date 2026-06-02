@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using MediClaim.Application.Features.Claims.UpgradePolicy;
 using MediClaim.Application
     .Features.Policies.CreatePolicyType;
 using MediClaim.Application.Features.Policies.EnrollPolicy;
@@ -13,7 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace MediClaim.API.Controllers;
 
 [ApiController]
-[Route("api/policies")]
+[Route("v1/policies")]
 [Authorize]
 public class PoliciesController
     : ControllerBase
@@ -33,6 +34,27 @@ public class PoliciesController
         var policyTypeId = await _mediator.Send(command);
         return Ok(policyTypeId);
     }
+    /// <summary>
+    /// Enroll patient into policy.
+    /// </summary>
+    /// <remarks>
+    /// Creates a new policy enrollment for the specified patient.
+    /// </remarks>
+    /// <response code="200">
+    /// Policy enrolled successfully.
+    /// </response>
+    /// <response code="400">
+    /// Validation failure.
+    /// </response>
+    /// <response code="401">
+    /// Unauthorized.
+    /// </response>
+    /// <response code="403">
+    /// Forbidden.
+    /// </response>
+    /// <response code="500">
+    /// Internal server error.
+    /// </response>
     [HttpPost("enroll")]
     [Authorize(
     Roles = nameof(UserRole.TenantAdmin))]
@@ -42,14 +64,42 @@ public class PoliciesController
         var policyId = await _mediator.Send(command);
         return Ok(policyId);
     }
+    /// <summary>
+    /// Upgrade existing policy.
+    /// </summary>
+    /// <remarks>
+    /// Upgrades policy to another policy type.
+    /// </remarks>
+    /// <response code="204">
+    /// Policy upgraded successfully.
+    /// </response>
+    /// <response code="400">
+    /// Validation failure.
+    /// </response>
+    /// <response code="401">
+    /// Unauthorized.
+    /// </response>
+    /// <response code="403">
+    /// Forbidden.
+    /// </response>
+    /// <response code="404">
+    /// Policy not found.
+    /// </response>
+    /// <response code="500">
+    /// Internal server error.
+    /// </response>
     [HttpPut("{policyId}/upgrade")]
     [Authorize(
     Roles = nameof(UserRole.TenantAdmin))]
     public async Task<IActionResult> Upgrade(
         Guid policyId,
-        UpgradePolicyCommand command)
+        [FromBody] UpgradePolicyRequest request)
     {
-        command.PolicyId = policyId;
+        var command = new UpgradePolicyCommand
+        {
+            PolicyId = policyId,
+            NewPolicyTypeId = request.NewPolicyTypeId
+        };
         await _mediator.Send(command);
         return NoContent();
     }

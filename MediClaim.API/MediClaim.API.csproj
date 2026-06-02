@@ -9,16 +9,12 @@
   <ItemGroup>
     <Compile Remove="Extensions\**" />
     <Compile Remove="Filters\**" />
-    <Compile Remove="Swagger\**" />
     <Content Remove="Extensions\**" />
     <Content Remove="Filters\**" />
-    <Content Remove="Swagger\**" />
     <EmbeddedResource Remove="Extensions\**" />
     <EmbeddedResource Remove="Filters\**" />
-    <EmbeddedResource Remove="Swagger\**" />
     <None Remove="Extensions\**" />
     <None Remove="Filters\**" />
-    <None Remove="Swagger\**" />
   </ItemGroup>
     
   <ItemGroup>
@@ -40,5 +36,15 @@
 	<PropertyGroup>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
+	<Target Name="ValidateOpenApi" AfterTargets="Build">
 
+		<!-- Generate latest swagger.json from current DLL -->
+
+		<Exec Command='swagger tofile --output "$(ProjectDir)swagger.json" "$(TargetPath)" v1' />
+
+		<!-- Run governance validation -->
+
+		<Exec Command='spectral lint "$(ProjectDir)swagger.json" --ruleset "C:\MediClaim\.spectral.yaml"' />
+
+	</Target>
 </Project>

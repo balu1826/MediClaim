@@ -6,16 +6,29 @@ info:
   description: Enterprise Claims Processing API
 
   contact:
-    name: MediClaim API Team
-    email: api-support@mediclaim.com
+    name: API Support Team
+    email: api-support@company.com
+
+  x-api-id: 6f6c8df0-4d7e-4df7-8f3e-9f53f2bbf111
+  x-business-unit: INSURANCE
+  x-compliance-level: HIPAA
+  x-data-classification: CONFIDENTIAL
 
 servers:
-  - url: https://localhost:5001
+  - url: https://localhost:44312
     description: Local Development
 
 tags:
   - name: Claims
     description: Claim workflow operations
+
+x-rate-limit:
+  requests-per-minute: 1000
+  burst: 100
+
+x-sla:
+  availability: 99.95
+  response-time-p95: 200ms
 
 paths:
 
@@ -30,7 +43,7 @@ paths:
 
       description: Transitions claim from Draft state to Submitted state
 
-      operationId: SubmitClaim
+      operationId: submitClaim
 
       security:
         - bearerAuth: []
@@ -40,13 +53,13 @@ paths:
         - name: claimId
           in: path
           required: true
+          description: Unique claim identifier
 
           schema:
             type: string
             format: uuid
 
-          description: Claim identifier
-          example: "550e8400-e29b-41d4-a716-446655440000"
+          example: "11111111-1111-1111-1111-111111111111"
 
         - $ref: '#/components/parameters/CorrelationIdHeader'
 
@@ -57,46 +70,79 @@ paths:
         '204':
           description: Claim submitted successfully
 
+          headers:
+
+            X-Correlation-ID:
+              description: Correlation identifier for request tracing
+
+              schema:
+                type: string
+
         '400':
           description: Validation failure
 
           content:
 
-            application/problem+json:
+            application/json:
 
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
 
-        '401':
-          description: Unauthorized
+              examples:
 
-        '403':
-          description: Forbidden
+                ValidationFailure:
+
+                  value:
+                    traceId: "abc123"
+                    errorCode: "CLAIM_VALIDATION_FAILED"
+                    message: "Claim already submitted"
+
+        '401':
+          description: Unauthorized request
+
+          content:
+
+            application/json:
+
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
 
         '404':
           description: Claim not found
 
-        '409':
+          content:
+
+            application/json:
+
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+
+        '422':
           description: Claim already submitted
 
           content:
 
-            application/problem+json:
+            application/json:
 
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
 
         '429':
-          description: Too many requests
+          description: Rate limit exceeded
+
+          content:
+
+            application/json:
+
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
 
         '500':
           description: Internal server error
 
-          content:
+          
 
-            application/problem+json:
-
-              schema:
+          schema:
                 $ref: '#/components/schemas/ProblemDetails'
 
 components:
@@ -104,7 +150,6 @@ components:
   securitySchemes:
 
     bearerAuth:
-
       type: http
       scheme: bearer
       bearerFormat: JWT
@@ -117,12 +162,12 @@ components:
       in: header
       required: true
 
+      description: Correlation identifier used for distributed tracing
+
       schema:
         type: string
 
-      description: Distributed tracing correlation identifier
-
-      example: "9f3b6b8f-6f4d-4f3c-9d53-8c0d9d6f2f21"
+      example: "corr-123456"
 
     IdempotencyKeyHeader:
 
@@ -130,36 +175,34 @@ components:
       in: header
       required: true
 
+      description: Prevents duplicate claim submissions
+
       schema:
         type: string
 
-      description: Prevents duplicate submissions
-
-      example: "submit-claim-001"
+      example: "idem-123456"
 
   schemas:
 
     ProblemDetails:
 
-      type: object
+  type: object
 
-      required:
-        - title
-        - status
+  properties:
 
-      properties:
+    type:
+      type: string
 
-        type:
-          type: string
+    title:
+      type: string
 
-        title:
-          type: string
+    status:
+      type: integer
 
-        status:
-          type: integer
+    detail:
+      type: string
 
-        traceId:
-          type: string
+    instance:
+      type: string
 
-        detail:
-          type: string
+  additionalProperties: true

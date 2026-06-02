@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/OpenApi/">
     <File Path="claims-api.yaml" />
+    <File Path="policies-api.yaml" />
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".gitignore" />

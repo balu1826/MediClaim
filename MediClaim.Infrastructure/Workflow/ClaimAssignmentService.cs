@@ -41,7 +41,6 @@ SELECT *
 FROM Users WITH (UPDLOCK, ROWLOCK)
 WHERE TenantId = {0}
 AND Role = {1}
-AND IsActive = 1
 AND IsOnLeave = 0",
                     claim.TenantId,
                     (int)UserRole.ClaimsOfficer)

@@ -60,12 +60,28 @@ public class ClaimsController
 
         return Ok(claims);
     }
+    /// <summary>
+    /// Submit draft claim.
+    /// </summary>
+    /// <remarks>
+    /// Transitions claim from Draft state to Submitted state.
+    /// </remarks>
+    /// <response code="204">
+    /// Claim submitted successfully.
+    /// </response>
+    /// <response code="400">
+    /// Validation failure.
+    /// </response>
+    /// <response code="404">
+    /// Claim not found.
+    /// </response>
+    /// <response code="409">
+    /// Claim already submitted.
+    /// </response>
     [HttpPost("{claimId}/submit")]
     [Authorize(Roles = nameof(UserRole.Patient))]
     public async Task<IActionResult> Submit(
-         Guid claimId,
-        [FromHeader(Name = "Idempotency-Key")]
-        string idempotencyKey)
+         Guid claimId)
     {
         var command = new SubmitClaimCommand { ClaimId = claimId };
         await _mediator.Send(command);

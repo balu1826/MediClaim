@@ -1,6 +1,7 @@
 ﻿using MediClaim.Domain.Common;
 using MediClaim.Domain.Enums;
 
+
 namespace MediClaim.Domain.Entities;
 
 public class Claim
@@ -97,13 +98,12 @@ public class Claim
     {
         if (Status != ClaimStatus.Draft)
         {
-            throw new InvalidOperationException(
+            throw new UnprocessableEntityException(
                 "Only draft claims can be submitted");
         }
 
         Status = ClaimStatus.Submitted;
     }
-
     public void StartReview()
     {
         if (Status != ClaimStatus.Submitted)

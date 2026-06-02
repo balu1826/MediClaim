@@ -1,6 +1,46 @@
-extends: spectral:oas
+extends:
+  - spectral:oas
 
 rules:
+
+  ##################################################
+  # PATH RULES
+  ##################################################
+
+  path-kebab-case:
+    description: Paths must use kebab-case
+    severity: error
+    given: $.paths
+    then:
+      function: pattern
+      functionOptions:
+        match: "^(/[a-z0-9-{}]+)+$"
+
+  no-verbs-in-paths:
+    description: Paths should not contain verbs
+    severity: error
+    given: $.paths
+    then:
+      function: pattern
+      functionOptions:
+        notMatch: ".*(get|create|update|delete).*"
+  api-version-required:
+
+    description: API paths must contain version
+
+    severity: error
+
+    given: $.paths[*]~
+
+    then:
+      function: pattern
+
+      functionOptions:
+        match: "^/v[0-9]+/"
+
+  ##################################################
+  # OPERATION RULES
+  ##################################################
 
   operation-description:
     description: All operations must have descriptions
@@ -25,3 +65,171 @@ rules:
     then:
       field: operationId
       function: truthy
+
+  operation-tags:
+    description: All operations must have tags
+    severity: error
+    given: $.paths[*][*]
+    then:
+      field: tags
+      function: truthy
+
+  ##################################################
+  # RESPONSE RULES
+  ##################################################
+
+  operation-400-response:
+    description: APIs must define 400 response
+    severity: error
+    given: $.paths[*][*].responses
+    then:
+      field: "400"
+      function: truthy
+
+  operation-500-response:
+    description: APIs must define 500 response
+    severity: error
+    given: $.paths[*][*].responses
+    then:
+      field: "500"
+      function: truthy
+
+  operation-success-response:
+    description: APIs must define success response
+    severity: error
+    given: $.paths[*][*].responses
+    then:
+      function: schema
+      functionOptions:
+        schema:
+          type: object
+          minProperties: 1
+
+  ##################################################
+  # SECURITY RULES
+  ##################################################
+
+  
+  bearer-auth-required:
+    description: bearerAuth scheme must exist
+    severity: error
+    given: $.components.securitySchemes
+    then:
+      field: bearerAuth
+      function: truthy
+
+  ##################################################
+  # HEADER RULES
+  ##################################################
+
+  correlation-id-header:
+    description: Correlation ID header required
+    severity: warn
+    given:  $.paths[*][*]
+    then:
+      field: name
+      function: schema
+      functionOptions:
+        schema:
+          properties:
+            parameters:
+              type: array
+              contains:
+                type: object
+                properties:
+                  name:
+                    const: X-Correlation-ID
+                  in:
+                    const:header
+          required:
+            -name
+            -in
+         
+
+  ##################################################
+  # SCHEMA RULES
+  ##################################################
+
+  schema-description-required:
+    description: Schema properties must have descriptions
+    severity: warn
+    given: $.components.schemas[*].properties[*]
+    then:
+      field: description
+      function: truthy
+
+  no-additional-properties:
+    description: additionalProperties should be false
+    severity: warn
+    given: $.components.schemas[*]
+    then:
+      field: additionalProperties
+      function: falsy
+
+  ##################################################
+  # PAGINATION RULES
+  ##################################################
+
+  pagination-query-params:
+    description: Collection GET APIs should support pagination
+    severity: warn
+    given: $.paths[*].get.parameters[*]
+    then:
+      field: name
+      function: pattern
+      functionOptions:
+        match: "page|pageSize|limit|offset"
+
+  ##################################################
+  # CONTENT TYPE RULES
+  ##################################################
+
+  json-content-type:
+    description: APIs should support application/json
+    severity: error
+    given: $.paths[*][*].requestBody.content
+    then:
+      field: application/json
+      function: truthy
+
+  ##################################################
+  # STATUS CODE RULES
+  ##################################################
+
+  post-should-return-201:
+    description: POST APIs should return 201
+    severity: warn
+    given: $.paths[*].post.responses
+    then:
+      field: "201"
+      function: truthy
+
+  delete-should-return-204:
+    description: DELETE APIs should return 204
+    severity: warn
+    given: $.paths[*].delete.responses
+    then:
+      field: "204"
+      function: truthy
+
+  ##################################################
+  # NAMING RULES
+  ##################################################
+
+  operation-id-camelCase:
+    description: operationId must be camelCase
+    severity: warn
+    given: $.paths[*][*].operationId
+    then:
+      function: pattern
+      functionOptions:
+        match: "^[a-z][a-zA-Z0-9]+$"
+
+  schema-name-pascal-case:
+    description: Schema names must use PascalCase
+    severity: warn
+    given: $.components.schemas
+    then:
+      function: pattern
+      functionOptions:
+        match: "^[A-Z][a-zA-Z0-9]+$"

@@ -52,6 +52,7 @@ public class ExceptionHandlingMiddleware
                 TraceId = context.TraceIdentifier
             };
 
+
         switch (exception)
         {
             case ValidationException validationException:
@@ -113,6 +114,19 @@ public class ExceptionHandlingMiddleware
                     UnprocessableEntityException.Message;
 
                 break;
+            case Exception ex
+        when ex.GetType().FullName ==
+        "MediClaim.Domain.Exceptions.UnprocessableEntityException":
+
+                response.StatusCode = StatusCodes.Status422UnprocessableEntity;
+
+                problemDetails.Title = "Unprocessable Entity";
+
+                problemDetails.Status = response.StatusCode;
+
+                problemDetails.Detail = ex.Message;
+
+                break;
 
             default:
 
@@ -135,9 +149,13 @@ public class ExceptionHandlingMiddleware
                 break;
         }
 
-        var json =
-            JsonSerializer.Serialize(problemDetails);
+        if (!response.HasStarted)
+        {
+            response.ContentType = "application/json";
 
-        await response.WriteAsync(json);
+            response.StatusCode = problemDetails.Status;
+
+            await response.WriteAsJsonAsync(problemDetails);
+        }
     }
 }

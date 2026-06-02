@@ -32,10 +32,9 @@ public static class DependencyInjection
     configuration
         .GetSection("Jwt")
         .Get<JwtSettings>();
-        services
-            .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options =>
-            {
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+               {
                 options.TokenValidationParameters =
                     new TokenValidationParameters
                     {
@@ -50,6 +49,7 @@ public static class DependencyInjection
                                     jwtSettings.Key))
                     };
             });
+
         services.AddScoped<IApplicationDbContext>(
         provider =>provider.GetRequiredService<ApplicationDbContext>());
 

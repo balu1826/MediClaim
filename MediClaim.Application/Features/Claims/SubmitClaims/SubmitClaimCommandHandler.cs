@@ -64,8 +64,14 @@ public class SubmitClaimCommandHandler
 
         // Domain transition
 
+       
+        if (claim.Status != ClaimStatus.Draft)
+        {
+            throw new UnprocessableEntityException("Claim Already Submitted");
+        }
         claim.Submit();
         // Fraud evaluation
+
 
         var fraudResult =
             await _fraudScoringService

@@ -1,10 +1,12 @@
 using Hangfire;
 using MediClaim.API.Middleware;
+using MediClaim.API.Swagger;
 using MediClaim.Application;
 using MediClaim.Infrastructure;
 using MediClaim.Infrastructure.BackgroundJobs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using System.Reflection;
@@ -15,17 +17,23 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddFixedWindowLimiter(
+        "ClaimsPolicy",
+        config =>
+        {
+            config.PermitLimit = 1000;
+            config.Window = TimeSpan.FromMinutes(1);
+            config.QueueLimit = 100;
+        });
+});
 //Hangfire configuration
 builder.Services
-    .AddHangfire(configuration =>
-        configuration
-            .UseSqlServerStorage(
-                builder.Configuration
-                    .GetConnectionString(
-                        "DefaultConnection")));
-
-builder.Services
-    .AddHangfireServer();
+    .AddHangfire(configuration => configuration
+    .UseSqlServerStorage(builder.Configuration
+    .GetConnectionString("DefaultConnection")));
+builder.Services.AddHangfireServer();
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 
@@ -86,9 +94,11 @@ builder.Services.AddSwaggerGen(options =>
             ] = new List<string>()
         });
 });
+builder.Services.AddSwaggerDocumentation();
 builder.Services.AddMemoryCache();
 builder.Services.AddAuthorization();
 var app = builder.Build();
+app.UseRateLimiter();
 using (var scope =
     app.Services.CreateScope())
 {
@@ -149,13 +159,13 @@ if (app.Environment.IsDevelopment())
     });
 }
 app.UseHttpsRedirection();
-app.UseMiddleware<CorrelationIdMiddleware>();
-app.UseMiddleware<RequestTimingMiddleware>();
+//app.UseMiddleware<CorrelationIdMiddleware>();
+//app.UseMiddleware<RequestTimingMiddleware>();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
-app.UseMiddleware<AuditRequestMiddleware>();
+//app.UseMiddleware<AuditRequestMiddleware>();
 app.UseAuthentication();
 app.UseMiddleware<TenantResolutionMiddleware>();
-app.UseMiddleware<RateLimitingMiddleware>();
+//app.UseMiddleware<RateLimitingMiddleware>();
 app.UseAuthorization();
 app.UseHangfireDashboard("/hangfire");
 app.MapControllers();
